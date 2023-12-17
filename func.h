@@ -12,7 +12,7 @@ static bool arithmetic_mean_filter(std::filesystem::path path, int kernal_value 
     cv::Mat inputImage = cv::imread(path.string());
     if(inputImage.empty())
     {
-        std::cout << "Ошибка загрузки изображения" << std::endl;
+        std::cout << "Error" << std::endl;
         return -1;
     }
 
@@ -20,7 +20,7 @@ static bool arithmetic_mean_filter(std::filesystem::path path, int kernal_value 
 
     applyMeanFilter(inputImage, outputImage, kernal_value);
 
-    cv::imwrite(std::string( "OUTPUT_" + path.filename().string()), outputImage);
+    cv::imwrite(std::string( "OUTPUT_" + path.filename().string()), outputImage, {});
 
     return 0;
 }

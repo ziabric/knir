@@ -3,10 +3,10 @@
 
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Window/Event.hpp>
 
 #include <filesystem>
-#include <iostream>
 #include <set>
 
 #include <func.h>
@@ -16,6 +16,7 @@ namespace fs = std::filesystem;
 bool fileManagerOpen = false;
 fs::path currentPath;
 fs::path file;
+fs::path newFile;
 
 std::set<std::string> fileExt = {
         ".png",
@@ -24,6 +25,7 @@ std::set<std::string> fileExt = {
 };
 
 sf::Texture fileTexture;
+sf::Sprite fileSprite;
 bool showImage = false;
 
 void display(ImVec2 size = {0,0})
@@ -42,18 +44,35 @@ void display(ImVec2 size = {0,0})
     ImGui::Checkbox("Show image", &showImage);
     if (ImGui::Button("tmp"))
     {
-        arithmetic_mean_filter(file, 50);
+        if (arithmetic_mean_filter(file, 50) == 0)
+        {
+            newFile = fs::path(fs::current_path().string() + "/OUTPUT_" + file.filename().string());
+            std::cout<<newFile.string()<<std::endl;
+        }
     }
 
     if ( showImage && file.string() != "" && fileTexture.loadFromFile(file.string()))
     {
-        ImGui::Image(fileTexture);
+        fileSprite = sf::Sprite(fileTexture);
+        auto windowSize = ImGui::GetWindowSize();
+        fileSprite.setScale((windowSize.x/2)/fileTexture.getSize().x, (windowSize.x/2)/fileTexture.getSize().x);
+        auto newFileTexture = sf::Texture();
+
+        ImGui::Image(fileSprite);
+
+        if (newFileTexture.loadFromFile(newFile.string()))
+        {
+            auto newFileSprite = sf::Sprite(newFileTexture);
+            newFileSprite.setScale((windowSize.x/2)/fileTexture.getSize().x, (windowSize.x/2)/fileTexture.getSize().x);
+            ImGui::SameLine();
+            ImGui::Image(newFileSprite);
+        }
     }
 
     if (fileManagerOpen)
     {
         ImGui::SetNextWindowFocus();
-        ImGui::Begin("Simple fm", &fileManagerOpen, ImGuiWindowFlags_Modal + ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin("Simple file manager", &fileManagerOpen, ImGuiWindowFlags_Modal + ImGuiWindowFlags_NoCollapse);
 
         ImGui::Text("%s", currentPath.c_str());
 
