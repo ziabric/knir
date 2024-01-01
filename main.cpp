@@ -16,8 +16,6 @@ namespace fs = std::filesystem;
 
 bool fileManagerOpen = false;
 fs::path currentPath = fs::current_path();
-fs::path file;
-fs::path newFile;
 
 std::set<std::string> fileExt = {
         ".png",
@@ -25,11 +23,13 @@ std::set<std::string> fileExt = {
         ".jpg"
 };
 
+fs::path file;
 sf::Texture fileTexture;
 sf::Sprite fileSprite;
 
-sf::Texture fileTexture1;
-sf::Sprite fileSprite1;
+fs::path newFile;
+sf::Texture newFileTexture;
+sf::Sprite newFileSprite;
 
 std::vector<std::string> pathTmp;
 
@@ -122,12 +122,12 @@ void display(ImVec2 size = {0,0})
 
     ImGui::NextColumn();
 
-    if (file.string() != "" && fileTexture1.loadFromFile(file.string()))
+    if (newFile.string() != "" && newFileTexture.loadFromFile(newFile.string()))
     {
-        fileSprite1 = sf::Sprite(fileTexture1);
-        fileSprite1.setScale((GetColumnDistance(2))/fileTexture1.getSize().x, (GetColumnDistance(2))/fileTexture1.getSize().x);
+        newFileSprite = sf::Sprite(newFileTexture);
+        newFileSprite.setScale((GetColumnDistance(2))/newFileTexture.getSize().x, (GetColumnDistance(2))/newFileTexture.getSize().x);
         
-        ImGui::Image(fileSprite1);
+        ImGui::Image(newFileSprite);
     }
     
     ImGui::End();
