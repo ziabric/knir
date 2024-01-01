@@ -28,7 +28,15 @@ std::set<std::string> fileExt = {
 sf::Texture fileTexture;
 sf::Sprite fileSprite;
 
+sf::Texture fileTexture1;
+sf::Sprite fileSprite1;
+
 std::vector<std::string> pathTmp;
+
+float GetColumnDistance(int n)
+{
+    return ImGui::GetColumnOffset(n + 1) - ImGui::GetColumnOffset(n);
+}
 
 void display(ImVec2 size = {0,0})
 {
@@ -104,38 +112,24 @@ void display(ImVec2 size = {0,0})
 
     ImGui::NextColumn();
 
-    // ImGui::Text("%s", file.filename().c_str());
-    // if (ImGui::Button("tmp"))
-    // {
-    //     if (arithmetic_mean_filter(file, 50) == 0)
-    //     {
-    //         newFile = fs::path(fs::current_path().string() + "/OUTPUT_" + file.filename().string());
-    //         std::cout<<newFile.string()<<std::endl;
-    //     }
-    // }
-
     if (file.string() != "" && fileTexture.loadFromFile(file.string()))
     {
         fileSprite = sf::Sprite(fileTexture);
-        auto windowSize = ImGui::GetWindowSize();
-        fileSprite.setScale((windowSize.x/2)/fileTexture.getSize().x, (windowSize.x/2)/fileTexture.getSize().x);
-        auto newFileTexture = sf::Texture();
-
+        fileSprite.setScale((GetColumnDistance(1))/fileTexture.getSize().x, (GetColumnDistance(1))/fileTexture.getSize().x);
+        
         ImGui::Image(fileSprite);
-
-        if (newFileTexture.loadFromFile(newFile.string()))
-        {
-            auto newFileSprite = sf::Sprite(newFileTexture);
-            newFileSprite.setScale((windowSize.x/2)/fileTexture.getSize().x, (windowSize.x/2)/fileTexture.getSize().x);
-            ImGui::SameLine();
-        }
     }
 
     ImGui::NextColumn();
 
-
-    ImGui::Image(fileSprite);
-
+    if (file.string() != "" && fileTexture1.loadFromFile(file.string()))
+    {
+        fileSprite1 = sf::Sprite(fileTexture1);
+        fileSprite1.setScale((GetColumnDistance(2))/fileTexture1.getSize().x, (GetColumnDistance(2))/fileTexture1.getSize().x);
+        
+        ImGui::Image(fileSprite1);
+    }
+    
     ImGui::End();
 }
 
