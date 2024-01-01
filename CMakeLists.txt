@@ -32,6 +32,7 @@ set(IMGUI
 set(SOURCES
         main.cpp
         func.h
+        MainWindow.hpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI})
