@@ -8,13 +8,14 @@
 
 #include <filesystem>
 #include <set>
+#include <sstream>
 
 #include <func.h>
 
 namespace fs = std::filesystem;
 
 bool fileManagerOpen = false;
-fs::path currentPath;
+fs::path currentPath = fs::current_path();
 fs::path file;
 fs::path newFile;
 
@@ -26,58 +27,52 @@ std::set<std::string> fileExt = {
 
 sf::Texture fileTexture;
 sf::Sprite fileSprite;
-bool showImage = false;
+
+std::vector<std::string> pathTmp;
 
 void display(ImVec2 size = {0,0})
 {
     auto font = ImGui::GetFont();
-    font->Scale = 1.2;
+    font->FontSize = 25;
     ImGui::Begin("KNIR", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoTitleBar + ImGuiWindowFlags_NoMove);
     ImGui::SetWindowPos({0,0});
     ImGui::SetWindowSize(size);
-    if (ImGui::Button("Open"))
+
+    std::stringstream ss(currentPath.string());
+    std::string s;
+    pathTmp.clear();
+    while(getline(ss, s, '/'))
     {
-        fileManagerOpen = true;
-        currentPath = fs::current_path();
+        if (s != "") pathTmp.push_back(s);
     }
-    ImGui::Text("%s", file.filename().c_str());
-    ImGui::Checkbox("Show image", &showImage);
-    if (ImGui::Button("tmp"))
+    
+    if (ImGui::Button("/"))
     {
-        if (arithmetic_mean_filter(file, 50) == 0)
+        currentPath = "/";
+    }
+
+    for (int i = 0; i < pathTmp.size(); i += 1)
+    {
+        ImGui::SameLine();
+        if(ImGui::Button(pathTmp.at(i).c_str()))
         {
-            newFile = fs::path(fs::current_path().string() + "/OUTPUT_" + file.filename().string());
-            std::cout<<newFile.string()<<std::endl;
+            fs::path newPath;
+            for (int j = 0; j <= i; j += 1)
+            {
+                newPath += "/";
+                newPath += pathTmp[j];
+            }
+            newPath += "/";
+            currentPath = newPath;
         }
+        ImGui::SameLine();
+        ImGui::Text("/");
     }
 
-    if ( showImage && file.string() != "" && fileTexture.loadFromFile(file.string()))
+    ImGui::Columns(3);
+
+    if (ImGui::BeginChild("fs", {-1,-1}, true))
     {
-        fileSprite = sf::Sprite(fileTexture);
-        auto windowSize = ImGui::GetWindowSize();
-        fileSprite.setScale((windowSize.x/2)/fileTexture.getSize().x, (windowSize.x/2)/fileTexture.getSize().x);
-        auto newFileTexture = sf::Texture();
-
-        ImGui::Image(fileSprite);
-
-        if (newFileTexture.loadFromFile(newFile.string()))
-        {
-            auto newFileSprite = sf::Sprite(newFileTexture);
-            newFileSprite.setScale((windowSize.x/2)/fileTexture.getSize().x, (windowSize.x/2)/fileTexture.getSize().x);
-            ImGui::SameLine();
-            ImGui::Image(newFileSprite);
-        }
-    }
-
-    if (fileManagerOpen)
-    {
-        ImGui::SetNextWindowFocus();
-        ImGui::Begin("Simple file manager", &fileManagerOpen, ImGuiWindowFlags_Modal + ImGuiWindowFlags_NoCollapse);
-
-        ImGui::Text("%s", currentPath.c_str());
-
-        auto tmp = ImGui::GetIO();
-
         if ( fs::exists(currentPath.parent_path()) )
         {
             if (ImGui::Button("..", {ImGui::GetWindowSize().x, 25}))
@@ -92,7 +87,7 @@ void display(ImVec2 size = {0,0})
             {
                 if ( ImGui::Button(std::string(item.path().filename().string()).c_str(), {ImGui::GetWindowSize().x, 25}) )
                 {
-                     currentPath = item;
+                        currentPath = item;
                 }
             }
             else if ( item.is_regular_file() )
@@ -104,9 +99,42 @@ void display(ImVec2 size = {0,0})
                 }
             }
         }
-
-        ImGui::End();
+        ImGui::EndChild();
     }
+
+    ImGui::NextColumn();
+
+    // ImGui::Text("%s", file.filename().c_str());
+    // if (ImGui::Button("tmp"))
+    // {
+    //     if (arithmetic_mean_filter(file, 50) == 0)
+    //     {
+    //         newFile = fs::path(fs::current_path().string() + "/OUTPUT_" + file.filename().string());
+    //         std::cout<<newFile.string()<<std::endl;
+    //     }
+    // }
+
+    if (file.string() != "" && fileTexture.loadFromFile(file.string()))
+    {
+        fileSprite = sf::Sprite(fileTexture);
+        auto windowSize = ImGui::GetWindowSize();
+        fileSprite.setScale((windowSize.x/2)/fileTexture.getSize().x, (windowSize.x/2)/fileTexture.getSize().x);
+        auto newFileTexture = sf::Texture();
+
+        ImGui::Image(fileSprite);
+
+        if (newFileTexture.loadFromFile(newFile.string()))
+        {
+            auto newFileSprite = sf::Sprite(newFileTexture);
+            newFileSprite.setScale((windowSize.x/2)/fileTexture.getSize().x, (windowSize.x/2)/fileTexture.getSize().x);
+            ImGui::SameLine();
+        }
+    }
+
+    ImGui::NextColumn();
+
+
+    ImGui::Image(fileSprite);
 
     ImGui::End();
 }
