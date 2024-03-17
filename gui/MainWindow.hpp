@@ -11,6 +11,7 @@
 #include <filesystem>
 #include <opencv2/opencv.hpp>
 
+#include <algor.h>
 
 namespace fs = std::filesystem;
 
@@ -67,4 +68,6 @@ private:
 
     int settingsType = -1;
     bool filesystemOpenFlag = false;
+
+    algor al;
 };

@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD 17)
 include_directories( ${PROJECT_SOURCE_DIR}/ )
 include_directories( ${PROJECT_SOURCE_DIR}/imgui )
 include_directories( ${PROJECT_SOURCE_DIR}/gui )
+include_directories( ${PROJECT_SOURCE_DIR}/algor )
 
 find_package(OpenCV REQUIRED)
 find_package(SFML COMPONENTS system graphics audio network REQUIRED)
@@ -38,12 +39,18 @@ file(GLOB GUI
         ${PROJECT_SOURCE_DIR}/gui/*
 )
 
+file(GLOB ALGOR
+        ${PROJECT_SOURCE_DIR}/algor/*
+)
+
+add_library(algor STATIC ${ALGOR})
+
 if(WIN32)
     add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
-    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system opengl32 ${OpenCV_LIBS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system opengl32 ${OpenCV_LIBS} algor)
 endif()
 
 if(UNIX)
     add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
-    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system GL ${OpenCV_LIBS})
+    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system GL ${OpenCV_LIBS} algor)
 endif()
