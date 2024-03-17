@@ -30,9 +30,9 @@ int MainWindow::mainloop()
 
         size = {(float)window->getSize().x, (float)window->getSize().y};
 
-        draw();
+        drawInterface();
         drawImage();
-        drawImagSettings();
+        drawFilesystem();
 
 
         window->clear();
@@ -41,84 +41,39 @@ int MainWindow::mainloop()
     }
     return 0;
 }
-void MainWindow::draw()
+void MainWindow::drawInterface()
 {
     ImGui::Begin("KNIR", nullptr, ImGuiWindowFlags_NoTitleBar + ImGuiWindowFlags_NoMove + ImGuiWindowFlags_NoResize);
     ImGui::SetWindowPos({0,0});
-    ImGui::SetWindowSize({60, size.y+20});
+    ImGui::SetWindowSize({60, size.y});
     settingsWindowSize = ImGui::GetWindowSize();
 
-    
-    // std::stringstream ss(currentPath.string());
-    // std::string s;
-    // pathTmp.clear();
-    // while(getline(ss, s, '/'))
-    // {
-    //     if (s != "") pathTmp.push_back(s);
-    // }
-    
-    // ImGui::BeginChild("PathToFile", {-1, 50}, true, ImGuiWindowFlags_HorizontalScrollbar);
-    // if (ImGui::Button("/"))
-    // {
-    //     currentPath = "/";
-    // }
-    // for (int i = 0; i < pathTmp.size(); i += 1)
-    // {
-    //     ImGui::SameLine();
-    //     if(ImGui::Button(pathTmp.at(i).c_str()))
-    //     {
-    //         fs::path newPath;
-    //         for (int j = 0; j <= i; j += 1)
-    //         {
-    //             newPath += "/";
-    //             newPath += pathTmp[j];
-    //         }
-    //         newPath += "/";
-    //         currentPath = newPath;
-    //     }
-    //     ImGui::SameLine();
-    //     ImGui::Text("/");
-    // }
-    // ImGui::SetScrollHereX(1);
-    // ImGui::EndChild();
-
-    // if (ImGui::BeginChild("fs", {-1,-1}, true))
-    // {
-    //     ImGui::GetStyle().ButtonTextAlign = {0,0.5};
-    //     for ( const auto& item : fs::directory_iterator(currentPath) )
-    //     {
-    //         if (item.path().filename().c_str()[0] == '.') continue;
-
-    //         if (is_directory(item))
-    //         {
-    //             if ( ImGui::Button(std::string(item.path().filename().string()).c_str(), {ImGui::GetWindowSize().x, 25}) )
-    //             {
-    //                 currentPath = item;
-    //             }
-    //         }
-    //         else if ( item.is_regular_file() )
-    //         {
-    //             if (fileExt.find(fs::path(item).extension().string()) != fileExt.end())
-    //             {
-    //                 if (ImGui::Button(item.path().filename().c_str(), {ImGui::GetWindowSize().x, 25})) openImage(item.path());
-    //             }
-    //             else
-    //             {
-    //                 if (ImGui::Button(item.path().filename().c_str(), {ImGui::GetWindowSize().x, 25})){}
-    //             }
-    //         }
-    //     }
-    //     ImGui::EndChild();
-    // }
-
-    for (int i = 0; i < 5; i += 1)
+    if ( ImGui::Button("Open") ) 
     {
-        if (ImGui::Button(std::to_string(i).c_str()))
-        {
-            if (settingsType != i) settingsType = i;
-        }
+        filesystemOpenFlag = true;
+    }
+    if ( ImGui::Button("Edit") )
+    {
+        if ( !file.empty() ) ImGui::OpenPopup("ImageSettings");
+    }
+    if ( ImGui::Button("Move") )
+    {
+
+    }
+    if ( ImGui::Button("Rotate") )
+    {
+
+    }
+    if ( ImGui::Button("Z +") )
+    {
+        if (fileScale < 2) fileScale += 0.1;
+    }
+    if ( ImGui::Button("Z -") )
+    {
+        if (fileScale > 0.1) fileScale -= 0.1;
     }
 
+    drawImageSettings();
     ImGui::End();
 }
 void MainWindow::drawImage()
@@ -131,9 +86,8 @@ void MainWindow::drawImage()
         fileWindowSize = ImGui::GetWindowSize();
 
         cv::Mat tmpForChannel;
-        cv::extractChannel(fileMat, tmpForChannel, (int)fileChannel);
-        // if (fileChannel != ChannelType::All) cv::extractChannel(fileMat, tmpForChannel, (int)fileChannel);
-        // else tmpForChannel = fileMat;
+        if (fileChannel != ChannelType::All) cv::extractChannel(fileMat, tmpForChannel, (int)fileChannel);
+        else tmpForChannel = fileMat;
 
         sf::Image fileImage;
         fileImage.create(tmpForChannel.cols, tmpForChannel.rows, tmpForChannel.ptr());
@@ -153,28 +107,27 @@ void MainWindow::drawImage()
         ImGui::End();
     }
 }
-void MainWindow::drawImagSettings()
+void MainWindow::drawImageSettings()
 {
-    if ( file.empty() ) return;
-
-    ImGui::Begin("Image title", nullptr, ImGuiWindowFlags_NoResize + ImGuiWindowFlags_NoTitleBar + ImGuiWindowFlags_NoMove + ImGuiWindowFlags_NoCollapse);
-    ImGui::SetWindowPos({fileWindowPos.x, fileWindowPos.y + fileWindowSize.y + 5});
-    if(ImGui::Button("1x"))
+    if (ImGui::BeginPopup("ImageSettings", ImGuiWindowFlags_NoMove))
     {
-        fileScale = 1;
+        ImGui::SetWindowPos({fileWindowPos.x, fileWindowPos.y + fileWindowSize.y + 5});
+        if(ImGui::Button("1x"))
+        {
+            fileScale = 1;
+        }
+        ImGui::SameLine();
+        ImGui::SliderFloat("Scale", &fileScale, 0.1, 2.0);
+        ImGui::Separator();
+        if (ImGui::RadioButton("B", fileChannel == ChannelType::Blue)) fileChannel = ChannelType::Blue;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("G", fileChannel == ChannelType::Green)) fileChannel = ChannelType::Green;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("R", fileChannel == ChannelType::Red)) fileChannel = ChannelType::Red;
+        ImGui::SameLine();
+        if (ImGui::RadioButton("All", fileChannel == ChannelType::All)) fileChannel = ChannelType::All;
+        ImGui::EndPopup();
     }
-    ImGui::SameLine();
-    ImGui::SetWindowSize({300, 65});
-    ImGui::SliderFloat("Scale", &fileScale, 0.1, 20.0);
-    ImGui::Separator();
-    if (ImGui::RadioButton("B", fileChannel == ChannelType::Blue)) fileChannel = ChannelType::Blue;
-    ImGui::SameLine();
-    if (ImGui::RadioButton("G", fileChannel == ChannelType::Green)) fileChannel = ChannelType::Green;
-    ImGui::SameLine();
-    if (ImGui::RadioButton("R", fileChannel == ChannelType::Red)) fileChannel = ChannelType::Red;
-    ImGui::SameLine();
-    if (ImGui::RadioButton("All", fileChannel == ChannelType::All)) fileChannel = ChannelType::All;
-    ImGui::End();
 }
 float MainWindow::GetColumnDistance(int n)
 {
@@ -186,6 +139,76 @@ void MainWindow::showInformationImage()
 void MainWindow::showInformationNewImage()
 {
     
+}
+void MainWindow::drawFilesystem()
+{
+    if (filesystemOpenFlag && ImGui::Begin("Filesystem", &filesystemOpenFlag, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::SetWindowFocus();
+        std::stringstream ss(currentPath.string());
+        std::string s;
+        pathTmp.clear();
+        while(getline(ss, s, '/'))
+        {
+            if (s != "") pathTmp.push_back(s);
+        }
+        
+        ImGui::BeginChild("PathToFile", {-1, 50}, true, ImGuiWindowFlags_HorizontalScrollbar);
+        if (ImGui::Button("/"))
+        {
+            currentPath = "/";
+        }
+        for (int i = 0; i < pathTmp.size(); i += 1)
+        {
+            ImGui::SameLine();
+            if(ImGui::Button(pathTmp.at(i).c_str()))
+            {
+                fs::path newPath;
+                for (int j = 0; j <= i; j += 1)
+                {
+                    newPath += "/";
+                    newPath += pathTmp[j];
+                }
+                newPath += "/";
+                currentPath = newPath;
+            }
+            ImGui::SameLine();
+            ImGui::Text("/");
+        }
+        ImGui::SetScrollHereX(1);
+        ImGui::EndChild();
+
+        if (ImGui::BeginChild("fs", {0,0}, true))
+        {
+            ImGui::GetStyle().ButtonTextAlign = {0,0.5};
+            for ( const auto& item : fs::directory_iterator(currentPath) )
+            {
+                if (item.path().filename().c_str()[0] == '.') continue;
+
+                if (is_directory(item))
+                {
+                    if ( ImGui::Button(std::string(item.path().filename().string()).c_str(), {ImGui::GetWindowSize().x, 25}) )
+                    {
+                        currentPath = item;
+                    }
+                }
+                else if ( item.is_regular_file() )
+                {
+                    if (fileExt.find(fs::path(item).extension().string()) != fileExt.end())
+                    {
+                        if (ImGui::Button(item.path().filename().c_str(), {ImGui::GetWindowSize().x, 25})) openImage(item.path());
+                    }
+                    else
+                    {
+                        if (ImGui::Button(item.path().filename().c_str(), {ImGui::GetWindowSize().x, 25})){}
+                    }
+                }
+            }
+            ImGui::EndChild();
+        }
+        ImGui::End();
+    }
+
 }
 void MainWindow::openImage(fs::path pathToImage)
 {

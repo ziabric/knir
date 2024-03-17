@@ -21,9 +21,10 @@ public:
     ~MainWindow();
     int mainloop();
 private:
-    void draw();
+    void drawInterface();
     void drawImage();
-    void drawImagSettings();
+    void drawImageSettings();
+    void drawFilesystem();
     float GetColumnDistance(int n);
     void showInformationImage();
     void showInformationNewImage();
@@ -65,4 +66,5 @@ private:
     ImVec2 settingsWindowSize = {0,0};
 
     int settingsType = -1;
+    bool filesystemOpenFlag = false;
 };

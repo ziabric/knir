@@ -38,12 +38,12 @@ file(GLOB GUI
         ${PROJECT_SOURCE_DIR}/gui/*
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
-
 if(WIN32)
+    add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
     target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system opengl32 ${OpenCV_LIBS})
 endif()
 
 if(UNIX)
+    add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
     target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system GL ${OpenCV_LIBS})
 endif()
