@@ -5,8 +5,8 @@ project(knir VERSION 1 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories( ${PROJECT_SOURCE_DIR}/ )
-include_directories( ${PROJECT_SOURCE_DIR}/include )
 include_directories( ${PROJECT_SOURCE_DIR}/imgui )
+include_directories( ${PROJECT_SOURCE_DIR}/gui )
 
 find_package(OpenCV REQUIRED)
 find_package(SFML COMPONENTS system graphics audio network REQUIRED)
@@ -32,13 +32,16 @@ set(IMGUI
 set(SOURCES
         main.cpp
         func.h
-        MainWindow.hpp
 )
 
-add_executable(${PROJECT_NAME} ${SOURCES} ${IMGUI})
+file(GLOB GUI
+        ${PROJECT_SOURCE_DIR}/gui/*
+)
+
+add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
 
 if(WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system opengl32 ${OPENCV_LIBRARIES})
+    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system opengl32 ${OpenCV_LIBS})
 endif()
 
 if(UNIX)
