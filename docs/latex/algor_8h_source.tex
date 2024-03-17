@@ -1,0 +1,39 @@
+\hypertarget{algor_8h_source}{}\doxysection{algor.\+h}
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{1 \textcolor{preprocessor}{\#ifndef ALGOR\_H}}
+\DoxyCodeLine{2 \textcolor{preprocessor}{\#define ALGOR\_H}}
+\DoxyCodeLine{3 }
+\DoxyCodeLine{7 \textcolor{keyword}{struct }\mbox{\hyperlink{struct_b_g_r_value}{BGRValue}} }
+\DoxyCodeLine{8 \{}
+\DoxyCodeLine{9     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} b = 0;}
+\DoxyCodeLine{10     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} g = 0;}
+\DoxyCodeLine{11     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} r = 0;}
+\DoxyCodeLine{12 \};}
+\DoxyCodeLine{13 }
+\DoxyCodeLine{14 \textcolor{comment}{// 1 -\/-\/ columns -\/> rows}}
+\DoxyCodeLine{15 }
+\DoxyCodeLine{20 \textcolor{keyword}{class }\mbox{\hyperlink{classalgor}{algor}}}
+\DoxyCodeLine{21 \{}
+\DoxyCodeLine{22 \textcolor{keyword}{public}:}
+\DoxyCodeLine{24     \mbox{\hyperlink{classalgor_a775ac7cf52213f05e772350d0526a9d7}{algor}}() = \textcolor{keywordflow}{default};}
+\DoxyCodeLine{26     \mbox{\hyperlink{classalgor_a9dc0583123cc23156626ac6230829f7f}{\string~algor}}();}
+\DoxyCodeLine{30     \textcolor{keywordtype}{void} \mbox{\hyperlink{classalgor_a33737339577d94bb27cfbc5e4a4e18a9}{setOrigImageSize}}(\textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} width, \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} height);}
+\DoxyCodeLine{36     \textcolor{keywordtype}{bool} \mbox{\hyperlink{classalgor_a96602278dde1d569ebe80fa069c34c7c}{setOrigImagePixel}}(\textcolor{keywordtype}{int} column, \textcolor{keywordtype}{int} row, \textcolor{keyword}{const} \mbox{\hyperlink{struct_b_g_r_value}{BGRValue}} \&pixel);}
+\DoxyCodeLine{39     \textcolor{keywordtype}{int} \mbox{\hyperlink{classalgor_af9c706e38e2baad0e8ee125e03e6bdcf}{getImageWidth}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{42     \textcolor{keywordtype}{int} \mbox{\hyperlink{classalgor_a12ed88edee7df1dbcef8b2d524ef5294}{getImageHeight}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{47     \mbox{\hyperlink{struct_b_g_r_value}{BGRValue}} \mbox{\hyperlink{classalgor_ae2e12ec6a667faee3c60f2fa7a8c4220}{getOrigImagePixel}}(\textcolor{keywordtype}{int} row, \textcolor{keywordtype}{int} column) \textcolor{keyword}{const};}
+\DoxyCodeLine{52     \mbox{\hyperlink{struct_b_g_r_value}{BGRValue}} \mbox{\hyperlink{classalgor_a47495815b7289eca521bbf2c5c9ada56}{getModImagePixel}}(\textcolor{keywordtype}{int} row, \textcolor{keywordtype}{int} column) \textcolor{keyword}{const};}
+\DoxyCodeLine{55     \textcolor{keywordtype}{bool} \mbox{\hyperlink{classalgor_a46e45342f4d6c142f30969e705bbb4cc}{origImageAvailable}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{58     \textcolor{keywordtype}{bool} \mbox{\hyperlink{classalgor_a31d6dfbba85ee7c713902de54d176432}{modImageAvailable}}() \textcolor{keyword}{const};}
+\DoxyCodeLine{60     \textcolor{keywordtype}{void} \mbox{\hyperlink{classalgor_a72db9b1cd5140e0ece8976c701175d92}{clearData}}(); }
+\DoxyCodeLine{61 \textcolor{keyword}{private}:}
+\DoxyCodeLine{63     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} height\_;}
+\DoxyCodeLine{65     \textcolor{keywordtype}{unsigned} \textcolor{keywordtype}{int} width\_;}
+\DoxyCodeLine{67     \mbox{\hyperlink{struct_b_g_r_value}{BGRValue}} * origData\_ = \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{69     \mbox{\hyperlink{struct_b_g_r_value}{BGRValue}} * modData\_ = \textcolor{keyword}{nullptr};}
+\DoxyCodeLine{70 \};}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72 \textcolor{preprocessor}{\#endif}}
+
+\end{DoxyCode}
