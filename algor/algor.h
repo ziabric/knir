@@ -78,6 +78,10 @@ private:
     /// @param b Second value
     /// @return Maximum value between a and b
     int max(int a, int b);
+    /// @brief Implementation of sorting an array of values
+    /// @param array Reference to the array for sorting
+    /// @param left The left border
+    /// @param right The right border
     void quickSort(unsigned int* array, unsigned int left, unsigned int right);
 private:
     /// @brief Image Height
