@@ -32,7 +32,6 @@ set(IMGUI
 
 set(SOURCES
         main.cpp
-        func.h
 )
 
 file(GLOB GUI

@@ -1,6 +1,8 @@
 #ifndef ALGOR_H
 #define ALGOR_H
 
+#include <algorithm>
+
 /**
  * @brief Storing pixel values
  */
@@ -58,6 +60,25 @@ public:
     bool modImageAvailable() const;
     /// @brief Cleaning images
     void clearData(); 
+    /// @brief Implementation of the median filter
+    /// @param radius The radius of the matrix for the median value
+    void medianFilter(int radius);
+private:
+    /// @brief Implementation of the change of two values
+    /// @param a First value
+    /// @param b Second value
+    void swap(unsigned int &a, unsigned int &b);
+    /// @brief Get minimum value
+    /// @param a First value
+    /// @param b Second value
+    /// @return Minimum value between a and b
+    int min(int a, int b);
+    /// @brief Get maximum value
+    /// @param a First value
+    /// @param b Second value
+    /// @return Maximum value between a and b
+    int max(int a, int b);
+    void quickSort(unsigned int* array, unsigned int left, unsigned int right);
 private:
     /// @brief Image Height
     unsigned int height_;
