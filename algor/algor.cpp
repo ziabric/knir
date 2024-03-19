@@ -139,3 +139,16 @@ void algor::swap(unsigned int &a, unsigned int &b)
     a = b;
     b = tmp;
 }
+
+double algor::sqrt(double x)
+{
+    if (x < 0) return -1;
+    double guess = 1.0;
+    while (abs(guess * guess - x) > 1e-10) guess = (guess + x / guess) / 2.0;
+    return guess;
+}
+
+double algor::abs(double x)
+{
+    return (x > 0) ? x : -x;
+}

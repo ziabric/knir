@@ -8,6 +8,7 @@ include_directories( ${PROJECT_SOURCE_DIR}/ )
 include_directories( ${PROJECT_SOURCE_DIR}/imgui )
 include_directories( ${PROJECT_SOURCE_DIR}/gui )
 include_directories( ${PROJECT_SOURCE_DIR}/algor )
+include_directories( ${PROJECT_SOURCE_DIR}/tests )
 
 find_package(OpenCV REQUIRED)
 find_package(SFML COMPONENTS system graphics audio network REQUIRED)
@@ -42,10 +43,18 @@ file(GLOB ALGOR
         ${PROJECT_SOURCE_DIR}/algor/*
 )
 
+file(GLOB TESTS
+        ${PROJECT_SOURCE_DIR}/tests/*
+        ${PROJECT_SOURCE_DIR}/algor/*
+)
+
 add_library(algor STATIC ${ALGOR})
 
+add_executable(test ${TESTS})
+target_link_libraries(test)
+
 if(WIN32)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
+    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${GUI} ${IMGUI})
     target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system opengl32 ${OpenCV_LIBS} algor)
 endif()
 
