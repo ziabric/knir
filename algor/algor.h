@@ -61,6 +61,15 @@ public:
     /// @brief Implementation of the median filter
     /// @param radius The radius of the matrix for the median value
     void medianFilter(int radius);
+    /// @brief 
+    /// @param levels 
+    void haarForwardTransform(int levels);
+    /// @brief 
+    /// @param levels 
+    void haarInverseTransform(int levels);
+    /// @brief 
+    /// @param level 
+    void haar(int level);
 protected:
     /// @brief Implementation of the change of two values
     /// @param a First value

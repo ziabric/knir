@@ -152,3 +152,49 @@ double algor::abs(double x)
 {
     return (x > 0) ? x : -x;
 }
+
+void algor::haarForwardTransform(int levels) 
+{
+  for (int level = 1; level <= levels; level+=1) 
+  {
+    int step = 1 << (level - 1);
+    for (int i = 0; i < height_; i += 2 * step) 
+    {
+      for (int j = 0; j < width_; j += 2 * step) 
+      {
+        // double ll = (origData_[i * width_ + j] + origData_[(i + step) * width_ + j] + origData_[i * width_ + j + step] + origData_[(i + step) * width_ + j + step]) * 0.5;
+        // double lh = (origData_[i * width_ + j] - origData_[(i + step) * width_ + j]) * scaling_factor(level);
+        // double hl = (origData_[i * width_ + j] - origData_[i * width_ + j + step]) * scaling_factor(level);
+        // double hh = (origData_[(i + step) * width_ + j] - origData_[(i + step) * width_ + j + step]) * scaling_factor(level);
+
+        modData_[i * width_ + j] = ll;
+        modData_[(i + step) * width_ + j] = lh;
+        modData_[i * width_ + j + step] = hl;
+        modData_[(i + step) * width_ + j + step] = hh;
+      }
+    }
+  }
+}
+
+void algor::haarInverseTransform(int levels) 
+{
+  for (int level = levels; level >= 1; --level) 
+  {
+    int step = 1 << (level - 1);
+    for (int i = 0; i < height; i += 2 * step) 
+    {
+      for (int j = 0; j < width_; j += 2 * step) 
+      {
+        // double ll = modData_[i * width_ + j];
+        // double lh = modData_[(i + step) * width_ + j];
+        // double hl = modData_[i * width_ + j + step];
+        // double hh = modData_[(i + step) * width_ + j + step];
+
+        modData_[i * width_ + j] = ll + scaling_factor(level) * (lh + hl + hh);
+        modData_[(i + step) * width_ + j] = ll + scaling_factor(level) * (lh - hh);
+        modData_[i * width_ + j + step] = ll + scaling_factor(level) * (-lh + hh);
+        modData_[(i + step) * width_ + j + step] = ll - scaling_factor(level) * (lh + hl - hh);
+      }
+    }
+  }
+}
