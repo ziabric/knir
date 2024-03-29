@@ -11,7 +11,7 @@ void algor::setOrigImageSize(unsigned int width, unsigned int height)
     height_ = height;
     origData_ = new BGRValue[width_ * height_];
 }
-bool algor::setOrigImagePixel(int column, int row, const BGRValue &pixel)
+bool algor::setOrigImagePixel(int column, int row, BGRValue pixel)
 {
     if ( column > width_ || row > height_ ) return false;
     else 
@@ -88,9 +88,13 @@ void algor::medianFilter(int radius)
             quickSort(medianArrayG, 0, (radius * radius) - 1);
             quickSort(medianArrayR, 0, (radius * radius) - 1);
 
-            modData_[x*width_ + y].b = medianArrayB[medianArrayCount/2];
-            modData_[x*width_ + y].g = medianArrayG[medianArrayCount/2];
-            modData_[x*width_ + y].r = medianArrayR[medianArrayCount/2];
+            unsigned int b = medianArrayB[medianArrayCount/2];
+            unsigned int g = medianArrayG[medianArrayCount/2];
+            unsigned int r = medianArrayR[medianArrayCount/2];
+
+            modData_[x*height_ + y].b = b;
+            modData_[x*height_ + y].g = g;
+            modData_[x*height_ + y].r = r;
         }
     }
     delete[] medianArrayB;

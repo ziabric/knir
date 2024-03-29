@@ -2,6 +2,7 @@
 #define ALGOR_H
 
 #include <algorithm>
+#include <iostream>
 
 /**
  * @brief Storing pixel values
@@ -35,7 +36,7 @@ public:
     /// @param row Pixel height address
     /// @param pixel Pixel color value in RGB format
     /// @return Error value ( true - there is no error, false - errors when recording a pixel )
-    bool setOrigImagePixel(int column, int row, const BGRValue &pixel);
+    bool setOrigImagePixel(int column, int row, BGRValue pixel);
     /// @brief Getting the width value of the original image
     /// @return The width of the original image
     int getImageWidth() const;
@@ -72,7 +73,7 @@ private:
     /// @param a First value
     /// @param b Second value
     /// @return Minimum value between a and b
-    int min(int a, int b);
+    int min(int a, int b);  
     /// @brief Get maximum value
     /// @param a First value
     /// @param b Second value
