@@ -1,9 +1,6 @@
 #ifndef ALGOR_H
 #define ALGOR_H
 
-#include <algorithm>
-#include <iostream>
-
 /**
  * @brief Storing pixel values
  */
@@ -64,7 +61,16 @@ public:
     /// @brief Implementation of the median filter
     /// @param radius The radius of the matrix for the median value
     void medianFilter(int radius);
-private:
+    /// @brief 
+    /// @param levels 
+    void haarForwardTransform(int levels);
+    /// @brief 
+    /// @param levels 
+    void haarInverseTransform(int levels);
+    /// @brief 
+    /// @param level 
+    void haar(int level);
+protected:
     /// @brief Implementation of the change of two values
     /// @param a First value
     /// @param b Second value
@@ -84,6 +90,14 @@ private:
     /// @param left The left border
     /// @param right The right border
     void quickSort(unsigned int* array, unsigned int left, unsigned int right);
+    /// @brief Taking the sqrt of a number based on the Newton-Raphson algorithm
+    /// @param x input value
+    /// @return sqrt value
+    double sqrt(double x);
+    /// @brief 
+    /// @param x 
+    /// @return 
+    double abs(double x);
 private:
     /// @brief Image Height
     unsigned int height_;
