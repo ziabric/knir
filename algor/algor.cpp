@@ -171,10 +171,10 @@ void algor::haarForwardTransform(int levels)
         // double hl = (origData_[i * width_ + j] - origData_[i * width_ + j + step]) * scaling_factor(level);
         // double hh = (origData_[(i + step) * width_ + j] - origData_[(i + step) * width_ + j + step]) * scaling_factor(level);
 
-        modData_[i * width_ + j] = ll;
-        modData_[(i + step) * width_ + j] = lh;
-        modData_[i * width_ + j + step] = hl;
-        modData_[(i + step) * width_ + j + step] = hh;
+        // modData_[i * width_ + j] = ll;
+        // modData_[(i + step) * width_ + j] = lh;
+        // modData_[i * width_ + j + step] = hl;
+        // modData_[(i + step) * width_ + j + step] = hh;
       }
     }
   }
@@ -194,10 +194,10 @@ void algor::haarInverseTransform(int levels)
         // double hl = modData_[i * width_ + j + step];
         // double hh = modData_[(i + step) * width_ + j + step];
 
-        modData_[i * width_ + j] = ll + scaling_factor(level) * (lh + hl + hh);
-        modData_[(i + step) * width_ + j] = ll + scaling_factor(level) * (lh - hh);
-        modData_[i * width_ + j + step] = ll + scaling_factor(level) * (-lh + hh);
-        modData_[(i + step) * width_ + j + step] = ll - scaling_factor(level) * (lh + hl - hh);
+        // modData_[i * width_ + j] = ll + scaling_factor(level) * (lh + hl + hh);
+        // modData_[(i + step) * width_ + j] = ll + scaling_factor(level) * (lh - hh);
+        // modData_[i * width_ + j + step] = ll + scaling_factor(level) * (-lh + hh);
+        // modData_[(i + step) * width_ + j + step] = ll - scaling_factor(level) * (lh + hl - hh);
       }
     }
   }
