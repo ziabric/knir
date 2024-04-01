@@ -24,7 +24,7 @@ int MainWindow::mainloop()
     if (ImGui::SFML::Init(*window))
     {
         auto tmp = base64_decode(fontString);
-        ImFont* font1 = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(tmp.data(), tmp.size(), 13);
+        ImFont* font1 = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(tmp.data(), tmp.size(), 18, nullptr, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
         if ( !ImGui::SFML::UpdateFontTexture() )
         {
             return 0;
@@ -94,6 +94,7 @@ void MainWindow::drawInterface()
     }
     if ( ImGui::Button("Medi") )
     {
+        std::cout<<"Start"<<std::endl;
         al.clearData();
         al.setOrigImageSize(fileImage.getSize().x, fileImage.getSize().y);
         for (size_t i = 0; i < fileImage.getSize().x; i += 1)
@@ -103,8 +104,9 @@ void MainWindow::drawInterface()
                 al.setOrigImagePixel(i, j, {fileImage.getPixel(i, j).b, fileImage.getPixel(i, j).g, fileImage.getPixel(i, j).r});
             }
         }
+        std::cout<<"Start median filter"<<std::endl;
         al.medianFilter(medianFilterRadius);
-        
+        std::cout<<"End median filter"<<std::endl;
         newFileImage = fileImage;
         for (size_t i = 0; i < newFileImage.getSize().x; i += 1)
         {
@@ -113,6 +115,8 @@ void MainWindow::drawInterface()
                 newFileImage.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
             }
         }
+        std::cout<<"End"<<std::endl;
+        newFileImageFlag = true;
     }
     if ( ImGui::Button("Haar") )
     {
@@ -122,9 +126,10 @@ void MainWindow::drawInterface()
 }
 void MainWindow::drawImage()
 {
-    if (fileImage.getSize().x > 0 && fileImage.getSize().y > 0)
+    if (fileImageFlag)
+    // if (fileImage.getSize().x > 0 && fileImage.getSize().y > 0)
     {
-        ImGui::Begin(file.filename().c_str(), nullptr, ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin(file.filename().c_str(), &fileImageFlag, ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
         ImGui::SetWindowPos({settingsWindowSize.x + 10, 10}, ImGuiCond_Once);
         fileWindowPos = ImGui::GetWindowPos();
         fileWindowSize = ImGui::GetWindowSize();
@@ -144,9 +149,10 @@ void MainWindow::drawImage()
 
         ImGui::End();
     }
-    if (newFileImage.getSize().x > 0 && newFileImage.getSize().y > 0)
+    if (newFileImageFlag)
+    // if (newFileImage.getSize().x > 0 && newFileImage.getSize().y > 0)
     {
-        ImGui::Begin(std::string("Median_" + file.filename().string()).c_str(), nullptr, ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
+        ImGui::Begin(std::string("Median_" + file.filename().string()).c_str(), &newFileImageFlag, ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
         ImGui::SetWindowPos({settingsWindowSize.x + 10, 10}, ImGuiCond_Once);
         fileWindowPos = ImGui::GetWindowPos();
         fileWindowSize = ImGui::GetWindowSize();
@@ -258,6 +264,7 @@ void MainWindow::openImage(fs::path pathToImage)
     fileImage.loadFromFile(file.string());
     fileScale = 1;
     filesystemOpenFlag = false;
+    fileImageFlag = true;
 }
 void MainWindow::imagePopupMenu()
 {

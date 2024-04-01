@@ -1,6 +1,9 @@
 #ifndef ALGOR_H
 #define ALGOR_H
 
+#include <memory>
+#include <algorithm>
+
 /**
  * @brief Storing pixel values
  */
@@ -85,11 +88,17 @@ protected:
     /// @param b Second value
     /// @return Maximum value between a and b
     int max(int a, int b);
+    /// @brief 
+    /// @param arr 
+    /// @param start 
+    /// @param end 
+    /// @return 
+    int partition(unsigned int* arr, int start, int end);
     /// @brief Implementation of sorting an array of values
-    /// @param array Reference to the array for sorting
-    /// @param left The left border
-    /// @param right The right border
-    void quickSort(unsigned int* array, unsigned int left, unsigned int right);
+    /// @param 
+    /// @param 
+    /// @param 
+    void quickSort(unsigned int* arr, int start, int end);
     /// @brief Taking the sqrt of a number based on the Newton-Raphson algorithm
     /// @param x input value
     /// @return sqrt value
@@ -98,15 +107,17 @@ protected:
     /// @param x 
     /// @return 
     double abs(double x);
+    ///
+    void bubbleSort(unsigned int* list, int listLength);
 private:
     /// @brief Image Height
     unsigned int height_;
     /// @brief Image Width
     unsigned int width_;
     /// @brief Pointer to the pixel values of the original image
-    BGRValue * origData_ = nullptr;
+    std::shared_ptr<BGRValue[]> origData_ = nullptr;
     /// @brief Pointer to the pixel values of the modified image
-    BGRValue * modData_ = nullptr;
+    std::shared_ptr<BGRValue[]> modData_ = nullptr;
 };
 
 #endif

@@ -2,14 +2,12 @@
 
 algor::~algor()
 {
-    delete[] origData_;
-    delete[] modData_;
 }
 void algor::setOrigImageSize(unsigned int width, unsigned int height)
 {
     width_ = width;
     height_ = height;
-    origData_ = new BGRValue[width_ * height_];
+    origData_ = std::make_shared<BGRValue[]>(width_ * height_);
 }
 bool algor::setOrigImagePixel(int column, int row, BGRValue pixel)
 {
@@ -46,19 +44,16 @@ bool algor::modImageAvailable() const
 }
 void algor::clearData()
 {
-    delete[] origData_;
-    delete[] modData_;
     origData_ = nullptr;
     modData_ = nullptr;
 }
 void algor::medianFilter(int radius)
 {
-    if (modData_ != nullptr) delete[] modData_;
-    modData_ = new BGRValue[width_ * height_];
+    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
 
-    unsigned int* medianArrayB = new unsigned int[radius * radius];
-    unsigned int* medianArrayG = new unsigned int[radius * radius];
-    unsigned int* medianArrayR = new unsigned int[radius * radius];
+    auto medianArrayB = std::make_shared<unsigned int[]>(radius * radius);
+    auto medianArrayG = std::make_shared<unsigned int[]>(radius * radius);
+    auto medianArrayR = std::make_shared<unsigned int[]>(radius * radius);
     int medianArrayCount = 0;
 
     int minX = 0;
@@ -84,9 +79,10 @@ void algor::medianFilter(int radius)
                     medianArrayR[medianArrayCount] = origData_[i*width_ + j].r;
                 }
             }
-            quickSort(medianArrayB, 0, (radius * radius) - 1);
-            quickSort(medianArrayG, 0, (radius * radius) - 1);
-            quickSort(medianArrayR, 0, (radius * radius) - 1);
+
+            bubbleSort(medianArrayB.get(), (radius * radius));
+            bubbleSort(medianArrayG.get(), (radius * radius));
+            bubbleSort(medianArrayR.get(), (radius * radius));
 
             unsigned int b = medianArrayB[medianArrayCount/2];
             unsigned int g = medianArrayG[medianArrayCount/2];
@@ -97,9 +93,6 @@ void algor::medianFilter(int radius)
             modData_[x*height_ + y].r = r;
         }
     }
-    delete[] medianArrayB;
-    delete[] medianArrayG;
-    delete[] medianArrayR;
 }
 int algor::min(int a, int b)
 {
@@ -109,32 +102,102 @@ int algor::max(int a, int b)
 {
     return (a > b) ? a : b;
 }
-void algor::quickSort(unsigned int* array, unsigned int left, unsigned int right) 
+void algor::bubbleSort(unsigned int* list, int listLength)
 {
-    if (left >= right) 
+	while(listLength--)
+	{
+		bool swapped = false;
+		
+		for(int i = 0; i < listLength; i++)
+		{
+			if(list[i] > list[i + 1])
+			{
+				swap(list[i], list[i + 1]);
+				swapped = true;
+			}
+		}
+		
+		if(swapped == false)
+			break;
+	}
+}
+// void algor::quickSort(unsigned int* array, unsigned int left, unsigned int right) 
+// {
+//     if (left >= right) 
+//     {
+//         return;
+//     }
+//     unsigned int pivot = array[left];
+//     unsigned int i = left + 1;
+//     unsigned int j = right;
+//     while (i <= j) 
+//     {
+//         while (array[i] < pivot) 
+//         {
+//             i+=1;
+//         }
+//         while (array[j] >= pivot) 
+//         {
+//             j-=1;
+//         }
+//         if (i <= j) 
+//         {
+//             swap(array[i], array[j]);
+//         }
+//     }
+//     quickSort(array, left, j - 1);
+//     quickSort(array, i, right);
+// }
+
+int algor::partition(unsigned int* arr, int start, int end)
+{   
+    int index = 0;
+    int pivotElement = arr[end];
+    int pivotIndex;
+    int* temp = new int[end - start + 1];
+    for (int i = start; i <= end; i++)
     {
-        return;
+        if(arr[i] < pivotElement)
+        {
+            temp[index] = arr[i];
+            index++;
+        }
     }
-    unsigned int pivot = array[left];
-    unsigned int i = left + 1;
-    unsigned int j = right;
-    while (i <= j) 
+ 
+    temp[index] = pivotElement;
+    index++;
+ 
+    for (int i = start; i < end; i++)
     {
-        while (array[i] < pivot) 
+        if(arr[i] > pivotElement)
         {
-            i+=1;
-        }
-        while (array[j] >= pivot) 
-        {
-            j-=1;
-        }
-        if (i <= j) 
-        {
-            swap(array[i], array[j]);
+            temp[index] = arr[i];
+            index++;
         }
     }
-    quickSort(array, left, j - 1);
-    quickSort(array, i, right);
+
+    index = 0;
+    for (int i = start; i <= end; i++)
+    {   
+        if(arr[i] == pivotElement)
+        {
+            pivotIndex = i;
+        }
+        arr[i] = temp[index];
+        index++;
+    }
+    return pivotIndex;
+}
+ 
+void algor::quickSort(unsigned int* arr, int start, int end)
+{  
+    if(start < end)
+    {   
+        int partitionIndex = partition(arr, start, end);
+        quickSort(arr, start, partitionIndex - 1);
+        quickSort(arr, partitionIndex + 1, end);
+    }
+    return;
 }
 
 void algor::swap(unsigned int &a, unsigned int &b)
@@ -184,21 +247,21 @@ void algor::haarInverseTransform(int levels)
 {
   for (int level = levels; level >= 1; --level) 
   {
-    int step = 1 << (level - 1);
-    for (int i = 0; i < height; i += 2 * step) 
-    {
-      for (int j = 0; j < width_; j += 2 * step) 
-      {
-        // double ll = modData_[i * width_ + j];
-        // double lh = modData_[(i + step) * width_ + j];
-        // double hl = modData_[i * width_ + j + step];
-        // double hh = modData_[(i + step) * width_ + j + step];
+    // int step = 1 << (level - 1);
+    // for (int i = 0; i < height; i += 2 * step) 
+    // {
+    //   for (int j = 0; j < width_; j += 2 * step) 
+    //   {
+    //     double ll = modData_[i * width_ + j];
+    //     double lh = modData_[(i + step) * width_ + j];
+    //     double hl = modData_[i * width_ + j + step];
+    //     double hh = modData_[(i + step) * width_ + j + step];
 
-        // modData_[i * width_ + j] = ll + scaling_factor(level) * (lh + hl + hh);
-        // modData_[(i + step) * width_ + j] = ll + scaling_factor(level) * (lh - hh);
-        // modData_[i * width_ + j + step] = ll + scaling_factor(level) * (-lh + hh);
-        // modData_[(i + step) * width_ + j + step] = ll - scaling_factor(level) * (lh + hl - hh);
-      }
-    }
+    //     modData_[i * width_ + j] = ll + scaling_factor(level) * (lh + hl + hh);
+    //     modData_[(i + step) * width_ + j] = ll + scaling_factor(level) * (lh - hh);
+    //     modData_[i * width_ + j + step] = ll + scaling_factor(level) * (-lh + hh);
+    //     modData_[(i + step) * width_ + j + step] = ll - scaling_factor(level) * (lh + hl - hh);
+    //   }
+    // }
   }
 }
