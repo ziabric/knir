@@ -30,7 +30,7 @@ private:
     float GetColumnDistance(int n);
     void showInformationImage();
     void showInformationNewImage();
-    void openImage(fs::path pathToImage);
+    inline void openImage(fs::path pathToImage);
     void imagePopupMenu();
 
     static inline bool is_base64(BYTE c) 
@@ -134,7 +134,7 @@ private:
             ".jpg"
     };
     fs::path file;
-    sf::Image fileImage;
+    std::shared_ptr<sf::Image> fileImage;
     sf::Texture fileTexture;
     sf::Sprite fileSprite;
     bool fileImageFlag = false;

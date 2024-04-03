@@ -47,8 +47,9 @@ int MainWindow::mainloop()
             size = {(float)window->getSize().x, (float)window->getSize().y};
             
             drawInterface();
-            drawImage();
             drawFilesystem();
+            drawImage();
+
 
             ImGui::PopFont();
 
@@ -63,7 +64,7 @@ void MainWindow::drawInterface()
 {
     ImGui::Begin("KNIR", nullptr, ImGuiWindowFlags_NoTitleBar + ImGuiWindowFlags_NoMove);
     ImGui::SetWindowPos({0,0});
-    ImGui::SetWindowSize({ImGui::GetWindowSize().x, size.y + 10});
+    ImGui::SetWindowSize({ImGui::GetWindowSize().x, size.y + 20});
     settingsWindowSize = ImGui::GetWindowSize();
 
     if ( ImGui::ImageButton(filesystemIcon) ) 
@@ -71,19 +72,6 @@ void MainWindow::drawInterface()
         filesystemOpenFlag = true;
     }
     
-    // if ( ImGui::Button("Edit") )
-    // {
-
-    // }
-    // if ( ImGui::Button("Move") )
-    // {
-
-    // }
-    // if ( ImGui::Button("Rot") )
-    // {
-
-    // }
-
     if ( ImGui::ImageButton(zoominIcon) )
     {
         if (fileScale < maxFileScale) fileScale += 0.1;
@@ -96,18 +84,18 @@ void MainWindow::drawInterface()
     {
         std::cout<<"Start"<<std::endl;
         al.clearData();
-        al.setOrigImageSize(fileImage.getSize().x, fileImage.getSize().y);
-        for (size_t i = 0; i < fileImage.getSize().x; i += 1)
+        al.setOrigImageSize(fileImage->getSize().x, fileImage->getSize().y);
+        for (size_t i = 0; i < fileImage->getSize().x; i += 1)
         {
-            for (size_t j = 0; j < fileImage.getSize().y; j += 1 )
+            for (size_t j = 0; j < fileImage->getSize().y; j += 1 )
             {
-                al.setOrigImagePixel(i, j, {fileImage.getPixel(i, j).b, fileImage.getPixel(i, j).g, fileImage.getPixel(i, j).r});
+                al.setOrigImagePixel(i, j, {fileImage->getPixel(i, j).b, fileImage->getPixel(i, j).g, fileImage->getPixel(i, j).r});
             }
         }
         std::cout<<"Start median filter"<<std::endl;
         al.medianFilter(medianFilterRadius);
         std::cout<<"End median filter"<<std::endl;
-        newFileImage = fileImage;
+        // newFileImage = fileImage;
         for (size_t i = 0; i < newFileImage.getSize().x; i += 1)
         {
             for (size_t j = 0; j < newFileImage.getSize().y; j += 1 )
@@ -122,19 +110,20 @@ void MainWindow::drawInterface()
     {
 
     }
+    ImGui::Separator();
+
     ImGui::End();
 }
 void MainWindow::drawImage()
 {
     if (fileImageFlag)
-    // if (fileImage.getSize().x > 0 && fileImage.getSize().y > 0)
     {
         ImGui::Begin(file.filename().c_str(), &fileImageFlag, ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
         ImGui::SetWindowPos({settingsWindowSize.x + 10, 10}, ImGuiCond_Once);
         fileWindowPos = ImGui::GetWindowPos();
         fileWindowSize = ImGui::GetWindowSize();
 
-        fileTexture.loadFromImage(fileImage);
+        fileTexture.loadFromImage(*(fileImage.get()));
         fileSprite.setTexture(fileTexture);
         fileSprite.setScale(fileScale, fileScale);
 
@@ -149,29 +138,28 @@ void MainWindow::drawImage()
 
         ImGui::End();
     }
-    if (newFileImageFlag)
-    // if (newFileImage.getSize().x > 0 && newFileImage.getSize().y > 0)
-    {
-        ImGui::Begin(std::string("Median_" + file.filename().string()).c_str(), &newFileImageFlag, ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
-        ImGui::SetWindowPos({settingsWindowSize.x + 10, 10}, ImGuiCond_Once);
-        fileWindowPos = ImGui::GetWindowPos();
-        fileWindowSize = ImGui::GetWindowSize();
+    // if (newFileImageFlag)
+    // {
+    //     ImGui::Begin(std::string("Median_" + file.filename().string()).c_str(), &newFileImageFlag, ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
+    //     ImGui::SetWindowPos({settingsWindowSize.x + 10, 10}, ImGuiCond_Once);
+    //     fileWindowPos = ImGui::GetWindowPos();
+    //     fileWindowSize = ImGui::GetWindowSize();
 
-        newFileTexture.loadFromImage(newFileImage);
-        newFileSprite.setTexture(newFileTexture);
-        newFileSprite.setScale(fileScale, fileScale);
+    //     newFileTexture.loadFromImage(newFileImage);
+    //     newFileSprite.setTexture(newFileTexture);
+    //     newFileSprite.setScale(fileScale, fileScale);
 
-        if ( ImGui::GetWindowPos().x < settingsWindowSize.x ) ImGui::SetWindowPos({settingsWindowSize.x, ImGui::GetWindowPos().y});
-        if ( ImGui::GetWindowPos().x + ImGui::GetWindowWidth() > size.x ) ImGui::SetWindowPos({size.x - ImGui::GetWindowWidth(), ImGui::GetWindowPos().y});
-        if ( ImGui::GetWindowPos().y < 0 ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, 0});
-        if ( ImGui::GetWindowPos().y + ImGui::GetWindowHeight() > size.y ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, size.y - ImGui::GetWindowSize().y});
+    //     if ( ImGui::GetWindowPos().x < settingsWindowSize.x ) ImGui::SetWindowPos({settingsWindowSize.x, ImGui::GetWindowPos().y});
+    //     if ( ImGui::GetWindowPos().x + ImGui::GetWindowWidth() > size.x ) ImGui::SetWindowPos({size.x - ImGui::GetWindowWidth(), ImGui::GetWindowPos().y});
+    //     if ( ImGui::GetWindowPos().y < 0 ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, 0});
+    //     if ( ImGui::GetWindowPos().y + ImGui::GetWindowHeight() > size.y ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, size.y - ImGui::GetWindowSize().y});
 
-        imagePopupMenu();
+    //     imagePopupMenu();
 
-        ImGui::Image(fileSprite);
+    //     ImGui::Image(fileSprite);
 
-        ImGui::End();
-    }
+    //     ImGui::End();
+    // }
 }
 float MainWindow::GetColumnDistance(int n)
 {
@@ -261,7 +249,11 @@ void MainWindow::drawFilesystem()
 void MainWindow::openImage(fs::path pathToImage)
 {
     file = pathToImage;
-    fileImage.loadFromFile(file.string());
+    
+    fileImage = nullptr;
+    fileImage = std::make_shared<sf::Image>();
+    std::cout<<fileImage->loadFromFile(file.string())<<std::endl;
+    std::cout<<fileImage->getSize().x<<" -- "<<fileImage->getSize().y<<" -- "<<fileImage->getPixel(fileImage->getSize().x, fileImage->getSize().y).toInteger()<<std::endl;
     fileScale = 1;
     filesystemOpenFlag = false;
     fileImageFlag = true;

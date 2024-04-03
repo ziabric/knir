@@ -10,7 +10,6 @@ include_directories( ${PROJECT_SOURCE_DIR}/gui )
 include_directories( ${PROJECT_SOURCE_DIR}/algor )
 include_directories( ${PROJECT_SOURCE_DIR}/tests )
 
-find_package(OpenCV REQUIRED)
 find_package(SFML COMPONENTS system graphics audio network REQUIRED)
 
 set(IMGUI
