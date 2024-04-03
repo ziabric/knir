@@ -12,7 +12,6 @@ size(width_, height_)
     zoominIcon.loadFromMemory(tmp.data(), tmp.size());
     tmp = base64_decode(zoomoutIconString);
     zoomoutIcon.loadFromMemory(tmp.data(), tmp.size());
-
 }
 MainWindow::~MainWindow()
 {
@@ -67,99 +66,89 @@ void MainWindow::drawInterface()
     ImGui::SetWindowSize({ImGui::GetWindowSize().x, size.y + 20});
     settingsWindowSize = ImGui::GetWindowSize();
 
-    if ( ImGui::ImageButton(filesystemIcon) ) 
+    if ( ImGui::ImageButton(filesystemIcon, {70, 70}) ) 
     {
         filesystemOpenFlag = true;
     }
-    
-    if ( ImGui::ImageButton(zoominIcon) )
+    ImGui::Separator();
+    for (auto item : fileImage)
     {
-        if (fileScale < maxFileScale) fileScale += 0.1;
+        // if ( item.filename == ImGui::Getwin )
     }
-    if ( ImGui::ImageButton(zoomoutIcon) )
+    ImGui::Separator();
+    if ( ImGui::Button("Median") )
     {
-        if (fileScale > minFileScale) fileScale -= 0.1;
-    }
-    if ( ImGui::Button("Medi") )
-    {
-        std::cout<<"Start"<<std::endl;
-        al.clearData();
-        al.setOrigImageSize(fileImage->getSize().x, fileImage->getSize().y);
-        for (size_t i = 0; i < fileImage->getSize().x; i += 1)
-        {
-            for (size_t j = 0; j < fileImage->getSize().y; j += 1 )
-            {
-                al.setOrigImagePixel(i, j, {fileImage->getPixel(i, j).b, fileImage->getPixel(i, j).g, fileImage->getPixel(i, j).r});
-            }
-        }
-        std::cout<<"Start median filter"<<std::endl;
-        al.medianFilter(medianFilterRadius);
-        std::cout<<"End median filter"<<std::endl;
-        // newFileImage = fileImage;
-        for (size_t i = 0; i < newFileImage.getSize().x; i += 1)
-        {
-            for (size_t j = 0; j < newFileImage.getSize().y; j += 1 )
-            {
-                newFileImage.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
-            }
-        }
-        std::cout<<"End"<<std::endl;
-        newFileImageFlag = true;
+        // std::cout<<"Start"<<std::endl;
+        // al.clearData();
+        // al.setOrigImageSize(fileImage->getSize().x, fileImage->getSize().y);
+        // for (size_t i = 0; i < fileImage->getSize().x; i += 1)
+        // {
+        //     for (size_t j = 0; j < fileImage->getSize().y; j += 1 )
+        //     {
+        //         al.setOrigImagePixel(i, j, {fileImage->getPixel(i, j).b, fileImage->getPixel(i, j).g, fileImage->getPixel(i, j).r});
+        //     }
+        // }
+        // std::cout<<"Start median filter"<<std::endl;
+        // al.medianFilter(medianFilterRadius);
+        // std::cout<<"End median filter"<<std::endl;
+        // // newFileImage = fileImage;
+        // for (size_t i = 0; i < newFileImage.getSize().x; i += 1)
+        // {
+        //     for (size_t j = 0; j < newFileImage.getSize().y; j += 1 )
+        //     {
+        //         newFileImage.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
+        //     }
+        // }
+        // std::cout<<"End"<<std::endl;
+        // newFileImageFlag = true;
     }
     if ( ImGui::Button("Haar") )
     {
 
     }
     ImGui::Separator();
-
+    for (int i = 0; i < fileImage.size(); i +=1)
+    {
+        if ( ImGui::Button(std::string( fileImage[i].filename ).c_str()) )
+        {
+            fileImage[i].openFlag = true;
+        }
+        ImGui::SameLine();
+        if ( ImGui::Button(std::string("X##" + std::to_string(i)).c_str()) )
+        {
+            fileImage.erase(std::next(fileImage.begin(), i));
+        }
+    }
     ImGui::End();
 }
 void MainWindow::drawImage()
 {
-    if (fileImageFlag)
+    for (int i = 0; i < fileImage.size(); i +=1)
     {
-        ImGui::Begin(file.filename().c_str(), &fileImageFlag, ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
-        ImGui::SetWindowPos({settingsWindowSize.x + 10, 10}, ImGuiCond_Once);
-        fileWindowPos = ImGui::GetWindowPos();
-        fileWindowSize = ImGui::GetWindowSize();
+        if ( fileImage[i].openFlag )
+        {
+            ImGui::Begin(std::string( fileImage[i].filename ).c_str(), &(fileImage[i].openFlag), ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
+            ImGui::SetWindowPos({settingsWindowSize.x + 10, 10}, ImGuiCond_Once);
+            ImGui::SetWindowSize({fileImage[i].image.getSize().x + 25, fileImage[i].image.getSize().y + 40}, ImGuiCond_Once);
+            fileWindowPos = ImGui::GetWindowPos();
+            fileWindowSize = ImGui::GetWindowSize();
 
-        fileTexture.loadFromImage(*(fileImage.get()));
-        fileSprite.setTexture(fileTexture);
-        fileSprite.setScale(fileScale, fileScale);
+            fileImage[i].texture.loadFromImage(fileImage[i].image);
+            fileImage[i].sprite.setTexture(fileImage[i].texture);
 
-        if ( ImGui::GetWindowPos().x < settingsWindowSize.x ) ImGui::SetWindowPos({settingsWindowSize.x, ImGui::GetWindowPos().y});
-        if ( ImGui::GetWindowPos().x + ImGui::GetWindowWidth() > size.x ) ImGui::SetWindowPos({size.x - ImGui::GetWindowWidth(), ImGui::GetWindowPos().y});
-        if ( ImGui::GetWindowPos().y < 0 ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, 0});
-        if ( ImGui::GetWindowPos().y + ImGui::GetWindowHeight() > size.y ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, size.y - ImGui::GetWindowSize().y});
+            fileImage[i].sprite.setScale(fileImage[i].scale, fileImage[i].scale);
+            ImGui::Image(fileImage[i].sprite);
 
-        imagePopupMenu();
+            if ( ImGui::GetWindowPos().x < settingsWindowSize.x ) ImGui::SetWindowPos({settingsWindowSize.x, ImGui::GetWindowPos().y});
+            if ( ImGui::GetWindowPos().x + ImGui::GetWindowWidth() > size.x ) ImGui::SetWindowPos({size.x - ImGui::GetWindowWidth(), ImGui::GetWindowPos().y});
+            if ( ImGui::GetWindowPos().y < 0 ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, 0});
+            if ( ImGui::GetWindowPos().y + ImGui::GetWindowHeight() > size.y ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, size.y - ImGui::GetWindowSize().y});
 
-        ImGui::Image(fileSprite);
+            imagePopupMenu();
 
-        ImGui::End();
+            ImGui::End();
+        }
     }
-    // if (newFileImageFlag)
-    // {
-    //     ImGui::Begin(std::string("Median_" + file.filename().string()).c_str(), &newFileImageFlag, ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
-    //     ImGui::SetWindowPos({settingsWindowSize.x + 10, 10}, ImGuiCond_Once);
-    //     fileWindowPos = ImGui::GetWindowPos();
-    //     fileWindowSize = ImGui::GetWindowSize();
-
-    //     newFileTexture.loadFromImage(newFileImage);
-    //     newFileSprite.setTexture(newFileTexture);
-    //     newFileSprite.setScale(fileScale, fileScale);
-
-    //     if ( ImGui::GetWindowPos().x < settingsWindowSize.x ) ImGui::SetWindowPos({settingsWindowSize.x, ImGui::GetWindowPos().y});
-    //     if ( ImGui::GetWindowPos().x + ImGui::GetWindowWidth() > size.x ) ImGui::SetWindowPos({size.x - ImGui::GetWindowWidth(), ImGui::GetWindowPos().y});
-    //     if ( ImGui::GetWindowPos().y < 0 ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, 0});
-    //     if ( ImGui::GetWindowPos().y + ImGui::GetWindowHeight() > size.y ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, size.y - ImGui::GetWindowSize().y});
-
-    //     imagePopupMenu();
-
-    //     ImGui::Image(fileSprite);
-
-    //     ImGui::End();
-    // }
 }
 float MainWindow::GetColumnDistance(int n)
 {
@@ -247,16 +236,15 @@ void MainWindow::drawFilesystem()
     }
 }
 void MainWindow::openImage(fs::path pathToImage)
-{
-    file = pathToImage;
-    
-    fileImage = nullptr;
-    fileImage = std::make_shared<sf::Image>();
-    std::cout<<fileImage->loadFromFile(file.string())<<std::endl;
-    std::cout<<fileImage->getSize().x<<" -- "<<fileImage->getSize().y<<" -- "<<fileImage->getPixel(fileImage->getSize().x, fileImage->getSize().y).toInteger()<<std::endl;
-    fileScale = 1;
+{    
+    imageStruct tmp;
+    tmp.image.loadFromFile(pathToImage);
+    tmp.filename = pathToImage.filename().string();
+    tmp.scale = 1;
+
+    fileImage.push_back(tmp);
     filesystemOpenFlag = false;
-    fileImageFlag = true;
+    tmp.openFlag = true;
 }
 void MainWindow::imagePopupMenu()
 {
@@ -267,20 +255,20 @@ void MainWindow::imagePopupMenu()
 
     if (ImGui::BeginPopup("filePopup", ImGuiWindowFlags_Popup))
     {
-        if(ImGui::Button("1x"))
-        {
-            fileScale = 1;
-        }
-        ImGui::SameLine();
-        ImGui::SliderFloat("Scale", &fileScale, minFileScale, maxFileScale);
-        ImGui::Separator();
-        if (ImGui::RadioButton("B", fileChannel == ChannelType::Blue)) fileChannel = ChannelType::Blue;
-        ImGui::SameLine();
-        if (ImGui::RadioButton("G", fileChannel == ChannelType::Green)) fileChannel = ChannelType::Green;
-        ImGui::SameLine();
-        if (ImGui::RadioButton("R", fileChannel == ChannelType::Red)) fileChannel = ChannelType::Red;
-        ImGui::SameLine();
-        if (ImGui::RadioButton("All", fileChannel == ChannelType::All)) fileChannel = ChannelType::All;
+        // if(ImGui::Button("1x"))
+        // {
+        //     fileScale = 1;
+        // }
+        // ImGui::SameLine();
+        // ImGui::SliderFloat("Scale", &fileScale, minFileScale, maxFileScale);
+        // ImGui::Separator();
+        // if (ImGui::RadioButton("B", fileChannel == ChannelType::Blue)) fileChannel = ChannelType::Blue;
+        // ImGui::SameLine();
+        // if (ImGui::RadioButton("G", fileChannel == ChannelType::Green)) fileChannel = ChannelType::Green;
+        // ImGui::SameLine();
+        // if (ImGui::RadioButton("R", fileChannel == ChannelType::Red)) fileChannel = ChannelType::Red;
+        // ImGui::SameLine();
+        // if (ImGui::RadioButton("All", fileChannel == ChannelType::All)) fileChannel = ChannelType::All;
         ImGui::EndPopup();
     }
 }

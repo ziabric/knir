@@ -2,6 +2,6 @@
 
 int main()
 {
-    MainWindow window("Window", 1280, 720);
+    MainWindow window("KNIR", 1280, 720);
     return window.mainloop();
 }

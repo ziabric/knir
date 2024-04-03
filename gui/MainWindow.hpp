@@ -11,11 +11,23 @@
 #include <filesystem>
 #include <set>
 #include <iostream>
+#include <vector>
 
 #include <algor.h>
 
 namespace fs = std::filesystem;
 using BYTE = unsigned char;
+
+struct imageStruct
+{
+    std::string filename;
+    sf::Image image;
+    sf::Texture texture;
+    sf::Sprite sprite;
+    bool openFlag;
+    float scale;
+};
+
 
 class MainWindow
 {
@@ -133,12 +145,7 @@ private:
             ".jpeg",
             ".jpg"
     };
-    fs::path file;
-    std::shared_ptr<sf::Image> fileImage;
-    sf::Texture fileTexture;
-    sf::Sprite fileSprite;
-    bool fileImageFlag = false;
-    float fileScale = 1;
+    std::vector<imageStruct> fileImage;
     float maxFileScale = 4;
     float minFileScale = 0.1;
     ImVec2 fileWindowPos = {};
