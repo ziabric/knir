@@ -70,13 +70,14 @@ void algor::medianFilter(int radius)
             int minY = max(0, y - radius);
             int maxY = min(height_ - 1, y + radius);
 
-            for (int i = minY; i <= maxX; i+=1) 
+            for (int i = minX; i <= maxX; i+=1) 
             {
-                for (int j = minX; j <= maxY; j+=1) 
+                for (int j = minY; j <= maxY; j+=1) 
                 {
                     medianArrayB[medianArrayCount] = origData_[i*width_ + j].b;
                     medianArrayG[medianArrayCount] = origData_[i*width_ + j].g;
                     medianArrayR[medianArrayCount] = origData_[i*width_ + j].r;
+                    medianArrayCount += 1;
                 }
             }
 
@@ -91,6 +92,8 @@ void algor::medianFilter(int radius)
             modData_[x*height_ + y].b = b;
             modData_[x*height_ + y].g = g;
             modData_[x*height_ + y].r = r;
+
+            medianArrayCount = 0;
         }
     }
 }
