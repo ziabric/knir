@@ -11,8 +11,8 @@ void algor::setOrigImageSize(unsigned int width, unsigned int height)
 }
 bool algor::setOrigImagePixel(int column, int row, BGRValue pixel)
 {
-    if ( column > width_ || row > height_ ) return false;
-    else 
+    if ( column >= width_ || row >= height_ ) return false;
+    else
     {
         origData_[column * width_ + row] = pixel;
         return true;
@@ -28,11 +28,11 @@ int algor::getImageHeight() const
 }
 BGRValue algor::getOrigImagePixel(int column, int row) const
 {
-    return {0,0,0}; 
+    return origData_[column * width_ + row];
 }
 BGRValue algor::getModImagePixel(int column, int row) const
 {
-    return {0,0,0};
+    return modData_[column * width_ + row];
 }
 bool algor::origImageAvailable() const
 {
@@ -51,49 +51,32 @@ void algor::medianFilter(int radius)
 {
     modData_ = std::make_shared<BGRValue[]>(width_ * height_);
 
-    auto medianArrayB = std::make_shared<unsigned int[]>(radius * radius);
-    auto medianArrayG = std::make_shared<unsigned int[]>(radius * radius);
-    auto medianArrayR = std::make_shared<unsigned int[]>(radius * radius);
-    int medianArrayCount = 0;
+    int windowSize = (2 * radius + 1) * (2 * radius + 1);
 
-    int minX = 0;
-    int maxX = 0;
-    int minY = 0;
-    int maxY = 0;
+    unsigned int redValues[windowSize];
+    unsigned int greenValues[windowSize];
+    unsigned int blueValues[windowSize];
 
-    for (int x = 1; x < width_ - 1; x += 1)
+    for (int i = radius; i < width_ - radius; i+=1) 
     {
-        for (int y = 1; y < height_ - 1; y += 1)
+        for (int j = radius; j < height_ - radius; j+=1) 
         {
-            int minX = max(0, x - radius);
-            int maxX = min(width_ - 1, x + radius);
-            int minY = max(0, y - radius);
-            int maxY = min(height_ - 1, y + radius);
+            int index = 0;
 
-            for (int i = minX; i <= maxX; i+=1) 
+            for (int x = -radius; x <= radius; x+=1) 
             {
-                for (int j = minY; j <= maxY; j+=1) 
+                for (int y = -radius; y <= radius; y+=1) 
                 {
-                    medianArrayB[medianArrayCount] = origData_[i*width_ + j].b;
-                    medianArrayG[medianArrayCount] = origData_[i*width_ + j].g;
-                    medianArrayR[medianArrayCount] = origData_[i*width_ + j].r;
-                    medianArrayCount += 1;
+                    redValues[index] = origData_[(i + x) * width_ + (j + y)].r;
+                    greenValues[index] = origData_[(i + x) * width_ + (j + y)].g;
+                    blueValues[index] = origData_[(i + x) * width_ + (j + y)].b;
+                    index += 1;
                 }
             }
 
-            bubbleSort(medianArrayB.get(), (radius * radius));
-            bubbleSort(medianArrayG.get(), (radius * radius));
-            bubbleSort(medianArrayR.get(), (radius * radius));
-
-            unsigned int b = medianArrayB[medianArrayCount/2];
-            unsigned int g = medianArrayG[medianArrayCount/2];
-            unsigned int r = medianArrayR[medianArrayCount/2];
-
-            modData_[x*height_ + y].b = b;
-            modData_[x*height_ + y].g = g;
-            modData_[x*height_ + y].r = r;
-
-            medianArrayCount = 0;
+            modData_[i * width_ + j].r = calculateMedian(redValues, windowSize);
+            modData_[i * width_ + j].g = calculateMedian(greenValues, windowSize);
+            modData_[i * width_ + j].b = calculateMedian(blueValues, windowSize);
         }
     }
 }
@@ -124,92 +107,17 @@ void algor::bubbleSort(unsigned int* list, int listLength)
 			break;
 	}
 }
-// void algor::quickSort(unsigned int* array, unsigned int left, unsigned int right) 
-// {
-//     if (left >= right) 
-//     {
-//         return;
-//     }
-//     unsigned int pivot = array[left];
-//     unsigned int i = left + 1;
-//     unsigned int j = right;
-//     while (i <= j) 
-//     {
-//         while (array[i] < pivot) 
-//         {
-//             i+=1;
-//         }
-//         while (array[j] >= pivot) 
-//         {
-//             j-=1;
-//         }
-//         if (i <= j) 
-//         {
-//             swap(array[i], array[j]);
-//         }
-//     }
-//     quickSort(array, left, j - 1);
-//     quickSort(array, i, right);
-// }
-
-int algor::partition(unsigned int* arr, int start, int end)
-{   
-    int index = 0;
-    int pivotElement = arr[end];
-    int pivotIndex;
-    int* temp = new int[end - start + 1];
-    for (int i = start; i <= end; i++)
-    {
-        if(arr[i] < pivotElement)
-        {
-            temp[index] = arr[i];
-            index++;
-        }
-    }
- 
-    temp[index] = pivotElement;
-    index++;
- 
-    for (int i = start; i < end; i++)
-    {
-        if(arr[i] > pivotElement)
-        {
-            temp[index] = arr[i];
-            index++;
-        }
-    }
-
-    index = 0;
-    for (int i = start; i <= end; i++)
-    {   
-        if(arr[i] == pivotElement)
-        {
-            pivotIndex = i;
-        }
-        arr[i] = temp[index];
-        index++;
-    }
-    return pivotIndex;
+unsigned int algor::calculateMedian(unsigned int* arr, int size)
+{
+    bubbleSort(arr, size);
+    return arr[size / 2];
 }
- 
-void algor::quickSort(unsigned int* arr, int start, int end)
-{  
-    if(start < end)
-    {   
-        int partitionIndex = partition(arr, start, end);
-        quickSort(arr, start, partitionIndex - 1);
-        quickSort(arr, partitionIndex + 1, end);
-    }
-    return;
-}
-
 void algor::swap(unsigned int &a, unsigned int &b)
 {
     unsigned int tmp = a;
     a = b;
     b = tmp;
 }
-
 double algor::sqrt(double x)
 {
     if (x < 0) return -1;
@@ -217,12 +125,10 @@ double algor::sqrt(double x)
     while (abs(guess * guess - x) > 1e-10) guess = (guess + x / guess) / 2.0;
     return guess;
 }
-
 double algor::abs(double x)
 {
     return (x > 0) ? x : -x;
 }
-
 void algor::haarForwardTransform(int levels) 
 {
   for (int level = 1; level <= levels; level+=1) 
@@ -245,7 +151,6 @@ void algor::haarForwardTransform(int levels)
     }
   }
 }
-
 void algor::haarInverseTransform(int levels) 
 {
   for (int level = levels; level >= 1; --level) 

@@ -74,7 +74,7 @@ void MainWindow::drawInterface()
     if (currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "") 
     {
         ImGui::SameLine();
-        if ( ImGui::ImageButton(exportIcon, {35, 35}) ) 
+        if ( ImGui::ImageButton(exportIcon, {35, 35}) )
         {
             exportFileFlag = true;
         }
@@ -83,26 +83,30 @@ void MainWindow::drawInterface()
         ImGui::Separator();
         if (ImGui::ImageButton(zoomoutIcon))
         {
-            fileImage[currentImage].scale -= 0.1;
+            fileImage[currentImage].scale -= 1;
         }
         ImGui::SameLine();
         if (ImGui::ImageButton(zoominIcon))
         {
-            fileImage[currentImage].scale += 0.1;
+            fileImage[currentImage].scale += 1;
         }
         ImGui::SliderFloat("##ScaleFoat", &fileImage[currentImage].scale, minFileScale, maxFileScale);
         ImGui::Separator();
+        ImGui::Text(std::string("Width  -- " + std::to_string(fileImage[currentImage].image.getSize().x)).c_str());
+        ImGui::Text(std::string("Height -- " + std::to_string(fileImage[currentImage].image.getSize().y)).c_str());
         ImGui::Text("Point color");
         ImGui::InputInt2("##PointPos", fileImage[currentImage].pixelPos);
-        if ( fileImage[currentImage].pixelPos[0] >= 0 && fileImage[currentImage].pixelPos[0] <= fileImage[currentImage].image.getSize().x 
-            && fileImage[currentImage].pixelPos[1] >= 0 && fileImage[currentImage].pixelPos[1] <= fileImage[currentImage].image.getSize().y )
+        if ( fileImage[currentImage].pixelPos[0] >= 0 && fileImage[currentImage].pixelPos[0] < fileImage[currentImage].image.getSize().x 
+            && fileImage[currentImage].pixelPos[1] >= 0 && fileImage[currentImage].pixelPos[1] < fileImage[currentImage].image.getSize().y )
         {
             ImGui::Text("%s", std::string("B -- " + std::to_string(fileImage[currentImage].image.getPixel(fileImage[currentImage].pixelPos[0], fileImage[currentImage].pixelPos[1]).b)).c_str());
             ImGui::Text("%s", std::string("G -- " + std::to_string(fileImage[currentImage].image.getPixel(fileImage[currentImage].pixelPos[0], fileImage[currentImage].pixelPos[1]).g)).c_str());
             ImGui::Text("%s", std::string("R -- " + std::to_string(fileImage[currentImage].image.getPixel(fileImage[currentImage].pixelPos[0], fileImage[currentImage].pixelPos[1]).r)).c_str());
         }
         ImGui::Separator();
-        if ( ImGui::Button("Median") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
+        ImGui::Text("Median");
+        ImGui::SliderInt("radius", &medianFilterRadius, 1, 50);
+        if ( ImGui::Button("Start##Median") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
         {
             std::cout<<"Start"<<std::endl;
             al.clearData();
@@ -111,7 +115,7 @@ void MainWindow::drawInterface()
             {
                 for (size_t j = 0; j < fileImage[currentImage].image.getSize().y; j += 1 )
                 {
-                    al.setOrigImagePixel(i, j, {fileImage[currentImage].image.getPixel(i, j).b, fileImage[currentImage].image.getPixel(i, j).g, fileImage[currentImage].image.getPixel(i, j).r});
+                    al.setOrigImagePixel(i, j, {(unsigned int)fileImage[currentImage].image.getPixel(i, j).b, (unsigned int)fileImage[currentImage].image.getPixel(i, j).g, (unsigned int)fileImage[currentImage].image.getPixel(i, j).r});
                 }
             }
             std::cout<<"Start median filter"<<std::endl;
@@ -126,10 +130,12 @@ void MainWindow::drawInterface()
             {
                 for (size_t j = 0; j < newImage.image.getSize().y; j += 1 )
                 {
-                    std::cout<<"==="<<std::endl;
-                    std::cout<< al.getModImagePixel(i, j).r << " -- " << al.getModImagePixel(i, j).g << " -- " << " -- " << al.getModImagePixel(i, j).b << std::endl;
+                    // std::cout<<"==="<<std::endl;
+                    // std::cout<< (unsigned int)fileImage[currentImage].image.getPixel(i,j).r << " -- " << (unsigned int)fileImage[currentImage].image.getPixel(i,j).g << " -- " << (unsigned int)fileImage[currentImage].image.getPixel(i,j).b << std::endl;
+                    // std::cout<< al.getOrigImagePixel(i, j).r << " -- " << al.getOrigImagePixel(i, j).g << " -- " << al.getOrigImagePixel(i, j).b << std::endl;
+                    // std::cout<< al.getModImagePixel(i, j).r << " -- " << al.getModImagePixel(i, j).g << " -- " << al.getModImagePixel(i, j).b << std::endl;
                     newImage.image.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
-                    std::cout<< (int)newImage.image.getPixel(i,j).r << " -- " << (int)newImage.image.getPixel(i,j).g << " -- " << (int)newImage.image.getPixel(i,j).b << std::endl;
+                    // std::cout<< (int)newImage.image.getPixel(i,j).r << " -- " << (int)newImage.image.getPixel(i,j).g << " -- " << (int)newImage.image.getPixel(i,j).b << std::endl;
                 }
             }
             std::cout<<"End"<<std::endl;
@@ -139,6 +145,7 @@ void MainWindow::drawInterface()
 
             fileImage.push_back(newImage);
         }
+        ImGui::Separator();
         if ( ImGui::Button("Haar") )
         {
 
@@ -191,8 +198,6 @@ void MainWindow::drawImage()
             if ( ImGui::GetWindowPos().y < 0 ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, 0});
             if ( ImGui::GetWindowPos().y + ImGui::GetWindowHeight() > size.y ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, size.y - ImGui::GetWindowSize().y});
 
-            // imagePopupMenu();
-
             ImGui::End();
         }
     }
@@ -200,12 +205,6 @@ void MainWindow::drawImage()
 float MainWindow::GetColumnDistance(int n)
 {
     return ImGui::GetColumnOffset(n + 1) - ImGui::GetColumnOffset(n);
-}
-void MainWindow::showInformationImage()
-{
-}
-void MainWindow::showInformationNewImage()
-{
 }
 void MainWindow::drawFilesystem()
 {

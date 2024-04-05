@@ -74,6 +74,11 @@ public:
     /// @param level 
     void haar(int level);
 protected:
+    /// @brief 
+    /// @param arr 
+    /// @param size 
+    /// @return 
+    unsigned int calculateMedian(unsigned int* arr, int size);
     /// @brief Implementation of the change of two values
     /// @param a First value
     /// @param b Second value
@@ -88,17 +93,6 @@ protected:
     /// @param b Second value
     /// @return Maximum value between a and b
     int max(int a, int b);
-    /// @brief 
-    /// @param arr 
-    /// @param start 
-    /// @param end 
-    /// @return 
-    int partition(unsigned int* arr, int start, int end);
-    /// @brief Implementation of sorting an array of values
-    /// @param 
-    /// @param 
-    /// @param 
-    void quickSort(unsigned int* arr, int start, int end);
     /// @brief Taking the sqrt of a number based on the Newton-Raphson algorithm
     /// @param x input value
     /// @return sqrt value
