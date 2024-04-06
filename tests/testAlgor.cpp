@@ -26,16 +26,6 @@ public:
     {
         return swap(a, b);
     }
-    bool testQuickSort(unsigned int* array, unsigned int left, unsigned int right)
-    {
-        quickSort(array, left, right);
-        bool testFlag = true;
-        for (int i = left+1; i < right; i += 1)
-        {
-            if (i > i-1) testFlag = false;
-        }
-        return testFlag;
-    }
 };
 
 

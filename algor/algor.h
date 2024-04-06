@@ -64,21 +64,27 @@ public:
     /// @brief Implementation of the median filter
     /// @param radius The radius of the matrix for the median value
     void medianFilter(int radius);
+    /// @brief Implementation of the median filter
+    /// @param radius The radius of the matrix for the median value
+    void newMedianFilter(int radius);
     /// @brief 
-    /// @param levels 
-    void haarForwardTransform(int levels);
+    void haar();
     /// @brief 
-    /// @param levels 
-    void haarInverseTransform(int levels);
-    /// @brief 
-    /// @param level 
-    void haar(int level);
+    /// @param kernelSize 
+    /// @param spatialSigma 
+    /// @param intensitySigma 
+    void bilateralFilter(int kernelSize, double spatialSigma, double intensitySigma);
 protected:
+    /// @brief Search median value in array
+    /// @param arr Array of median values
+    /// @param size Array size
+    /// @return Median value
+    unsigned int calculateMedian(unsigned int* arr, int size);
     /// @brief 
     /// @param arr 
     /// @param size 
     /// @return 
-    unsigned int calculateMedian(unsigned int* arr, int size);
+    unsigned int calculateNewMedian(unsigned int* arr, int size);
     /// @brief Implementation of the change of two values
     /// @param a First value
     /// @param b Second value
@@ -101,8 +107,18 @@ protected:
     /// @param x 
     /// @return 
     double abs(double x);
-    ///
+    /// @brief 
+    /// @param list 
+    /// @param listLength 
     void bubbleSort(unsigned int* list, int listLength);
+    
+    int partition(unsigned int* arr, int low, int high);
+    
+    void quickSort(unsigned int* arr, int low, int high);
+
+    double gaussian(double x, double y, double sigma);
+
+    double power(double base, int exponent);
 private:
     /// @brief Image Height
     unsigned int height_;
@@ -112,6 +128,8 @@ private:
     std::shared_ptr<BGRValue[]> origData_ = nullptr;
     /// @brief Pointer to the pixel values of the modified image
     std::shared_ptr<BGRValue[]> modData_ = nullptr;
+    /// @brief exp
+    float e = 2.718281828459045;
 };
 
 #endif

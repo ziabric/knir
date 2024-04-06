@@ -83,12 +83,12 @@ void MainWindow::drawInterface()
         ImGui::Separator();
         if (ImGui::ImageButton(zoomoutIcon))
         {
-            fileImage[currentImage].scale -= 1;
+            fileImage[currentImage].scale -= scaleStep;
         }
         ImGui::SameLine();
         if (ImGui::ImageButton(zoominIcon))
         {
-            fileImage[currentImage].scale += 1;
+            fileImage[currentImage].scale += scaleStep;
         }
         ImGui::SliderFloat("##ScaleFoat", &fileImage[currentImage].scale, minFileScale, maxFileScale);
         ImGui::Separator();
@@ -105,7 +105,7 @@ void MainWindow::drawInterface()
         }
         ImGui::Separator();
         ImGui::Text("Median");
-        ImGui::SliderInt("radius", &medianFilterRadius, 1, 50);
+        ImGui::SliderInt("radius##Median", &medianFilterRadius, 1, 50);
         if ( ImGui::Button("Start##Median") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
         {
             std::cout<<"Start"<<std::endl;
@@ -123,19 +123,14 @@ void MainWindow::drawInterface()
             std::cout<<"End median filter"<<std::endl;
 
             imageStruct newImage;
-            newImage.filename = "new " + fileImage[currentImage].filename;
+            newImage.filename = "med" + std::to_string(medianFilterRadius) + "_" + fileImage[currentImage].filename;
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
             {
                 for (size_t j = 0; j < newImage.image.getSize().y; j += 1 )
                 {
-                    // std::cout<<"==="<<std::endl;
-                    // std::cout<< (unsigned int)fileImage[currentImage].image.getPixel(i,j).r << " -- " << (unsigned int)fileImage[currentImage].image.getPixel(i,j).g << " -- " << (unsigned int)fileImage[currentImage].image.getPixel(i,j).b << std::endl;
-                    // std::cout<< al.getOrigImagePixel(i, j).r << " -- " << al.getOrigImagePixel(i, j).g << " -- " << al.getOrigImagePixel(i, j).b << std::endl;
-                    // std::cout<< al.getModImagePixel(i, j).r << " -- " << al.getModImagePixel(i, j).g << " -- " << al.getModImagePixel(i, j).b << std::endl;
                     newImage.image.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
-                    // std::cout<< (int)newImage.image.getPixel(i,j).r << " -- " << (int)newImage.image.getPixel(i,j).g << " -- " << (int)newImage.image.getPixel(i,j).b << std::endl;
                 }
             }
             std::cout<<"End"<<std::endl;
@@ -148,8 +143,115 @@ void MainWindow::drawInterface()
         ImGui::Separator();
         if ( ImGui::Button("Haar") )
         {
+            std::cout<<"Start"<<std::endl;
+            al.clearData();
+            al.setOrigImageSize(fileImage[currentImage].image.getSize().x, fileImage[currentImage].image.getSize().y);
+            for (size_t i = 0; i < fileImage[currentImage].image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < fileImage[currentImage].image.getSize().y; j += 1 )
+                {
+                    al.setOrigImagePixel(i, j, {(unsigned int)fileImage[currentImage].image.getPixel(i, j).b, (unsigned int)fileImage[currentImage].image.getPixel(i, j).g, (unsigned int)fileImage[currentImage].image.getPixel(i, j).r});
+                }
+            }
+            std::cout<<"Start haar filter"<<std::endl;
+            al.haar();
+            std::cout<<"End haar filter"<<std::endl;
 
+            imageStruct newImage;
+            newImage.filename = "haar_" + fileImage[currentImage].filename;
+
+            newImage.image = fileImage[currentImage].image;
+            for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < newImage.image.getSize().y; j += 1 )
+                {
+                    newImage.image.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
+                }
+            }
+            std::cout<<"End"<<std::endl;
+
+            newImage.texture.loadFromImage(newImage.image);
+            newImage.sprite.setTexture(newImage.texture);
+
+            fileImage.push_back(newImage);
         }
+        ImGui::Separator();
+        ImGui::Text("new Median");
+        ImGui::SliderInt("radius##newMedian", &newMedianFilterRadius, 1, 50);
+        if ( ImGui::Button("Start##newMedian") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
+        {
+            std::cout<<"Start"<<std::endl;
+            al.clearData();
+            al.setOrigImageSize(fileImage[currentImage].image.getSize().x, fileImage[currentImage].image.getSize().y);
+            for (size_t i = 0; i < fileImage[currentImage].image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < fileImage[currentImage].image.getSize().y; j += 1 )
+                {
+                    al.setOrigImagePixel(i, j, {(unsigned int)fileImage[currentImage].image.getPixel(i, j).b, (unsigned int)fileImage[currentImage].image.getPixel(i, j).g, (unsigned int)fileImage[currentImage].image.getPixel(i, j).r});
+                }
+            }
+            std::cout<<"Start new median filter"<<std::endl;
+            al.newMedianFilter(newMedianFilterRadius);
+            std::cout<<"End new median filter"<<std::endl;
+
+            imageStruct newImage;
+            newImage.filename = "nmed" + std::to_string(newMedianFilterRadius) + "_" + fileImage[currentImage].filename;
+
+            newImage.image = fileImage[currentImage].image;
+            for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < newImage.image.getSize().y; j += 1 )
+                {
+                    newImage.image.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
+                }
+            }
+            std::cout<<"End"<<std::endl;
+
+            newImage.texture.loadFromImage(newImage.image);
+            newImage.sprite.setTexture(newImage.texture);
+
+            fileImage.push_back(newImage);
+        }
+        ImGui::Separator();
+        ImGui::Text("Bilateral Gaus");
+        ImGui::SliderInt("Kernal##gaus", &gausKernalSize, 1, 50);
+        ImGui::SliderInt("Spatial_k##gaus", &gausSpatialSigma, 1, 50);
+        ImGui::SliderInt("Intensity_k##gaus", &gausIntensitySigma, 1, 50);
+        if ( ImGui::Button("Start##gaus") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
+        {
+            std::cout<<"Start"<<std::endl;
+            al.clearData();
+            al.setOrigImageSize(fileImage[currentImage].image.getSize().x, fileImage[currentImage].image.getSize().y);
+            for (size_t i = 0; i < fileImage[currentImage].image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < fileImage[currentImage].image.getSize().y; j += 1 )
+                {
+                    al.setOrigImagePixel(i, j, {(unsigned int)fileImage[currentImage].image.getPixel(i, j).b, (unsigned int)fileImage[currentImage].image.getPixel(i, j).g, (unsigned int)fileImage[currentImage].image.getPixel(i, j).r});
+                }
+            }
+            std::cout<<"Start gaus filter"<<std::endl;
+            al.bilateralFilter(gausKernalSize, gausSpatialSigma, gausIntensitySigma);
+            std::cout<<"End gaus filter"<<std::endl;
+
+            imageStruct newImage;
+            newImage.filename = "g" + std::to_string(gausKernalSize) + "_" + std::to_string(gausSpatialSigma) + "_" + std::to_string(gausIntensitySigma) + "_" + fileImage[currentImage].filename;
+
+            newImage.image = fileImage[currentImage].image;
+            for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < newImage.image.getSize().y; j += 1 )
+                {
+                    newImage.image.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
+                }
+            }
+            std::cout<<"End"<<std::endl;
+
+            newImage.texture.loadFromImage(newImage.image);
+            newImage.sprite.setTexture(newImage.texture);
+
+            fileImage.push_back(newImage);
+        }
+        ImGui::Separator();
     }
     if (fileImage.size()>0) ImGui::Separator();
     for (int i = 0; i < fileImage.size(); i +=1)
@@ -380,7 +482,7 @@ void MainWindow::drawExportFile()
             ImGui::SameLine();
             if (ImGui::Button("Save") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
             {
-                fileImage[currentImage].image.saveToFile(currentPath.string() + exportFileName);
+                fileImage[currentImage].image.saveToFile(currentPath.string() + "/" + exportFileName);
             }
         }
         ImGui::End();
