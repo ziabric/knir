@@ -252,7 +252,7 @@ void algor::haar()
         }
     }
 }
-double algor::gaussian(double x, double y, double sigma)
+double algor::gaussianBase(double x, double y, double sigma)
 {
     return power(e, (-(x * x + y * y) / (2 * sigma * sigma)));
 }
@@ -293,17 +293,17 @@ void algor::bilateralFilter(int kernelSize, double spatialSigma, double intensit
                     if (neighborX >= 0 && neighborX < width_ && neighborY >= 0 && neighborY < height_) 
                     {
                         double intensityDiff_b = origData_[neighborX * width_ + neighborY].b - origData_[x * width_ + y].b;
-                        double weight_b = gaussian(i, j, spatialSigma) * gaussian(intensityDiff_b, 0, intensitySigma);
+                        double weight_b = gaussianBase(i, j, spatialSigma) * gaussianBase(intensityDiff_b, 0, intensitySigma);
                         filteredValue_b += origData_[neighborX * width_ + neighborY].b * weight_b;
                         weightSum_b += weight_b;
 
                         double intensityDiff_g = origData_[neighborX * width_ + neighborY].g - origData_[x * width_ + y].g;
-                        double weight_g = gaussian(i, j, spatialSigma) * gaussian(intensityDiff_g, 0, intensitySigma);
+                        double weight_g = gaussianBase(i, j, spatialSigma) * gaussianBase(intensityDiff_g, 0, intensitySigma);
                         filteredValue_g += origData_[neighborX * width_ + neighborY].g * weight_g;
                         weightSum_g += weight_g;
 
                         double intensityDiff_r = origData_[neighborX * width_ + neighborY].r - origData_[x * width_ + y].r;
-                        double weight_r = gaussian(i, j, spatialSigma) * gaussian(intensityDiff_r, 0, intensitySigma);
+                        double weight_r = gaussianBase(i, j, spatialSigma) * gaussianBase(intensityDiff_r, 0, intensitySigma);
                         filteredValue_r += origData_[neighborX * width_ + neighborY].r * weight_r;
                         weightSum_r += weight_r;
                     }
@@ -316,3 +316,66 @@ void algor::bilateralFilter(int kernelSize, double spatialSigma, double intensit
         }
     }
 }
+double algor::gaussianRange(double x, double sigma) 
+{
+    return power(e, (-(x * x) / (2 * sigma * sigma)));
+}
+void algor::bilateralFilterRange(int kernelSize, double spatialSigma, double rangeSigma) 
+{
+    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+
+    int half_kernel = kernelSize / 2;
+    for (int i = 0; i < height_; i+=1) {
+        for (int j = 0; j < width_; j+=1) {
+            double norm_factor_b = 0.0;
+            double filtered_value_b = 0.0;
+            
+            double norm_factor_r = 0.0;
+            double filtered_value_r = 0.0;
+
+            double norm_factor_g = 0.0;
+            double filtered_value_g = 0.0;
+
+            for (int k = -half_kernel; k <= half_kernel; k+=1) {
+                for (int l = -half_kernel; l <= half_kernel; l+=1) {
+                    int ni = i + k;
+                    int nj = j + l;
+
+                    if (ni >= 0 && ni < height_ && nj >= 0 && nj < width_) {
+                        // blue channal
+                        double spatial_distance = sqrt(k * k + l * l);
+                        double range_distance = origData_[nj*width_ + ni].b - origData_[j*width_ + i].b;
+                        double spatial_weight = gaussianRange(spatial_distance, spatialSigma);
+                        double range_weight = gaussianRange(range_distance, rangeSigma);
+                        double weight = spatial_weight * range_weight;
+                        filtered_value_b += origData_[nj*width_ + ni].b * weight;
+                        norm_factor_b += weight;
+                        // green channal
+                        spatial_distance = sqrt(k * k + l * l);
+                        range_distance = origData_[nj*width_ + ni].g - origData_[j*width_ + i].g;
+                        spatial_weight = gaussianRange(spatial_distance, spatialSigma);
+                        range_weight = gaussianRange(range_distance, rangeSigma);
+                        weight = spatial_weight * range_weight;
+                        filtered_value_g += origData_[nj*width_ + ni].g * weight;
+                        norm_factor_g += weight;
+                        // red channal
+                        spatial_distance = sqrt(k * k + l * l);
+                        range_distance = origData_[nj*width_ + ni].r - origData_[j*width_ + i].r;
+                        spatial_weight = gaussianRange(spatial_distance, spatialSigma);
+                        range_weight = gaussianRange(range_distance, rangeSigma);
+                        weight = spatial_weight * range_weight;
+                        filtered_value_r += origData_[nj*width_ + ni].r * weight;
+                        norm_factor_r += weight;
+                    }
+                }
+            }
+
+            modData_[j*width_ + i].b = filtered_value_b / norm_factor_b;
+            modData_[j*width_ + i].g = filtered_value_g / norm_factor_g;
+            modData_[j*width_ + i].r = filtered_value_r / norm_factor_r;
+        }
+    }
+}
+
+
+

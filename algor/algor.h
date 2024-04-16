@@ -74,6 +74,11 @@ public:
     /// @param spatialSigma 
     /// @param intensitySigma 
     void bilateralFilter(int kernelSize, double spatialSigma, double intensitySigma);
+    /// @brief 
+    /// @param kernelSize 
+    /// @param spatialSigma 
+    /// @param rangeSigma 
+    void bilateralFilterRange(int kernelSize, double spatialSigma, double rangeSigma);
 protected:
     /// @brief Search median value in array
     /// @param arr Array of median values
@@ -116,7 +121,9 @@ protected:
     
     void quickSort(unsigned int* arr, int low, int high);
 
-    double gaussian(double x, double y, double sigma);
+    double gaussianBase(double x, double y, double sigma);
+
+    double gaussianRange(double x, double sigma);
 
     double power(double base, int exponent);
 private:

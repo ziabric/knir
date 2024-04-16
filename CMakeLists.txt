@@ -11,6 +11,7 @@ include_directories( ${PROJECT_SOURCE_DIR}/algor )
 include_directories( ${PROJECT_SOURCE_DIR}/tests )
 
 find_package(SFML COMPONENTS system graphics audio network REQUIRED)
+find_package(OpenCV REQUIRED)
 
 set(IMGUI
         imgui/imconfig.h
@@ -61,3 +62,7 @@ if(UNIX)
     add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
     target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system GL ${OpenCV_LIBS} algor)
 endif()
+
+install(FILES ${PROJECT_SOURCE_DIR}/model/coco.yaml DESTINATION ${PROJECT_BINARY_DIR}/)
+install(FILES ${PROJECT_SOURCE_DIR}/model/yolov5s.onnx DESTINATION ${PROJECT_BINARY_DIR}/)
+
