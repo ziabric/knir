@@ -8,7 +8,7 @@ size(width_, height_)
 
     try
     {
-        std::string path = std::filesystem::current_path().string() + "/vgg.onnx";
+        std::string path = std::filesystem::current_path().string() + "/yolov5s.onnx";
         net = readNet(path);
         // net = readNetFromONNX(path); 
         canLoadModel = true;
@@ -361,7 +361,7 @@ void MainWindow::drawImage()
         {
             ImGui::Begin(std::string( fileImage[i].filename ).c_str(), &(fileImage[i].openFlag), ImGuiWindowFlags_HorizontalScrollbar + ImGuiWindowFlags_NoCollapse);
             ImGui::SetWindowPos({settingsWindowSize.x + 10, 10}, ImGuiCond_Once);
-            ImGui::SetWindowSize({(float)fileImage[i].image.getSize().x + 25, (float)fileImage[i].image.getSize().y + 40}, ImGuiCond_Once);
+            // ImGui::SetWindowSize({(float)fileImage[i].image.getSize().x * fileImage[i].scale + 25, (float)fileImage[i].image.getSize().y * fileImage[i].scale + 40});
             fileWindowPos = ImGui::GetWindowPos();
             fileWindowSize = ImGui::GetWindowSize();
 
@@ -380,6 +380,22 @@ void MainWindow::drawImage()
             if ( ImGui::GetWindowPos().x + ImGui::GetWindowWidth() > size.x ) ImGui::SetWindowPos({size.x - ImGui::GetWindowWidth(), ImGui::GetWindowPos().y});
             if ( ImGui::GetWindowPos().y < 0 ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, 0});
             if ( ImGui::GetWindowPos().y + ImGui::GetWindowHeight() > size.y ) ImGui::SetWindowPos({ImGui::GetWindowPos().x, size.y - ImGui::GetWindowSize().y});
+
+            // if (
+            //     ImGui::GetWindowPos().x < ImGui::GetMousePos().x &&
+            //     ImGui::GetWindowPos().y < ImGui::GetMousePos().y &&
+            //     ImGui::GetWindowSize().x > ImGui::GetMousePos().x &&
+            //     ImGui::GetWindowSize().y > ImGui::GetMousePos().y &&
+            //     sf::Keyboard::isKeyPressed(sf::Keyboard::LControl) &&
+            //     ImGui::GetIO().MouseWheel != 0
+            // )
+            // {
+            //     std::cout<<"chack"<<std::endl;
+            //     fileImage[i].scale += (ImGui::GetIO().MouseWheel > 0) ? scaleStep/10 : -scaleStep/10;
+            // }
+
+            
+            ImGui::SetWindowSize({(float)fileImage[i].image.getSize().x + 25, (float)fileImage[i].image.getSize().y + 40}, ImGuiCond_Once);
 
             ImGui::End();
         }
