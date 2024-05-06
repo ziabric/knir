@@ -6,26 +6,26 @@ size(width_, height_)
     window = new sf::RenderWindow(sf::VideoMode(width_, height_), title_);
     window->setFramerateLimit(60);
 
-    try
-    {
-        std::string path = std::filesystem::current_path().string() + "/yolov5s.onnx";
-        net = readNet(path);
-        // net = readNetFromONNX(path); 
-        canLoadModel = true;
+    // try
+    // {
+    //     std::string path = std::filesystem::current_path().string() + "/yolov5s.onnx";
+    //     net = readNet(path);
+    //     // net = readNetFromONNX(path); 
+    //     canLoadModel = true;
 
-        std::ifstream ifs( std::filesystem::current_path().string() + "coco.yaml");
-        std::string line;
-        while (getline(ifs, line))
-        {
-            class_list.push_back(line);
-        }
-    }
-    catch (std::exception &e)
-    {
-        std::cout<<e.what()<<std::endl;
-        std::cout<<"Failed to load model :("<<std::endl;
-        canLoadModel = false;
-    }
+    //     std::ifstream ifs( std::filesystem::current_path().string() + "coco.yaml");
+    //     std::string line;
+    //     while (getline(ifs, line))
+    //     {
+    //         class_list.push_back(line);
+    //     }
+    // }
+    // catch (std::exception &e)
+    // {
+    //     std::cout<<e.what()<<std::endl;
+    //     std::cout<<"Failed to load model :("<<std::endl;
+    //     canLoadModel = false;
+    // }
     
     auto tmp = base64_decode(filesystemIconString);
     filesystemIcon.loadFromMemory(tmp.data(), tmp.size());
@@ -102,22 +102,22 @@ void MainWindow::drawInterface()
             exportFileFlag = true;
         }
         ImGui::SameLine();
-        if ( canLoadModel && ImGui::ImageButton(detectIcon, {35, 35}) )
-        {
-            cv::Size size(fileImage[currentImage].image.getSize().x, fileImage[currentImage].image.getSize().y);
-            cv::Mat cvImg(size, CV_8UC4, (void*)fileImage[currentImage].image.getPixelsPtr());
-            cv::cvtColor(cvImg, cvImg, cv::COLOR_BGRA2BGR);
-            std::vector<Mat> detections = pre_process(cvImg, net);
-            Mat img = post_process(cvImg, detections, class_list); 
-            imageStruct newImage;
-            newImage.filename = "dec_" + fileImage[currentImage].filename;
+        // if ( canLoadModel && ImGui::ImageButton(detectIcon, {35, 35}) )
+        // {
+        //     cv::Size size(fileImage[currentImage].image.getSize().x, fileImage[currentImage].image.getSize().y);
+        //     cv::Mat cvImg(size, CV_8UC4, (void*)fileImage[currentImage].image.getPixelsPtr());
+        //     cv::cvtColor(cvImg, cvImg, cv::COLOR_BGRA2BGR);
+        //     std::vector<Mat> detections = pre_process(cvImg, net);
+        //     Mat img = post_process(cvImg, detections, class_list); 
+        //     imageStruct newImage;
+        //     newImage.filename = "dec_" + fileImage[currentImage].filename;
             
-            cv::Mat convertedImg;
-            cv::cvtColor(img, img, cv::COLOR_BGR2RGBA);
-            newImage.image.create(convertedImg.cols, convertedImg.rows, convertedImg.data); 
+        //     cv::Mat convertedImg;
+        //     cv::cvtColor(img, img, cv::COLOR_BGR2RGBA);
+        //     newImage.image.create(convertedImg.cols, convertedImg.rows, convertedImg.data); 
 
-            fileImage.push_back(newImage);
-        }
+        //     fileImage.push_back(newImage);
+        // }
         ImGui::Separator();
         ImGui::Text("%s", fileImage[currentImage].filename.c_str());
         ImGui::Separator();
@@ -132,8 +132,14 @@ void MainWindow::drawInterface()
         }
         ImGui::SliderFloat("##ScaleFoat", &fileImage[currentImage].scale, minFileScale, maxFileScale);
         ImGui::Separator();
-        ImGui::Text(std::string("Width  -- " + std::to_string(fileImage[currentImage].image.getSize().x)).c_str());
-        ImGui::Text(std::string("Height -- " + std::to_string(fileImage[currentImage].image.getSize().y)).c_str());
+        ImGui::Text("%s", std::string("Work time => " + std::to_string(fileImage[currentImage].workTime) + " ms").c_str());
+        ImGui::Separator();
+        ImGui::Text("%s", std::string("MSE => b: " + std::to_string(fileImage[currentImage].mseValue.b) + " g: " + std::to_string(fileImage[currentImage].mseValue.g) + " r: " + std::to_string(fileImage[currentImage].mseValue.r)).c_str());
+        ImGui::Separator();
+        ImGui::Text("%s", std::string("PSNR => b: " + std::to_string(fileImage[currentImage].psnrValue.b) + " g: " + std::to_string(fileImage[currentImage].psnrValue.g) + " r: " + std::to_string(fileImage[currentImage].psnrValue.r)).c_str());
+        ImGui::Separator();
+        ImGui::Text("%s", std::string("Width  -- " + std::to_string(fileImage[currentImage].image.getSize().x)).c_str());
+        ImGui::Text("%s", std::string("Height -- " + std::to_string(fileImage[currentImage].image.getSize().y)).c_str());
         ImGui::Text("Point color");
         ImGui::InputInt2("##PointPos", fileImage[currentImage].pixelPos);
         if ( fileImage[currentImage].pixelPos[0] >= 0 && fileImage[currentImage].pixelPos[0] < fileImage[currentImage].image.getSize().x 
@@ -159,11 +165,23 @@ void MainWindow::drawInterface()
                 }
             }
             std::cout<<"Start median filter"<<std::endl;
+            auto start = std::chrono::high_resolution_clock::now();
             al.medianFilter(medianFilterRadius);
+            auto end = std::chrono::high_resolution_clock::now();
             std::cout<<"End median filter"<<std::endl;
 
             imageStruct newImage;
             newImage.filename = "med" + std::to_string(medianFilterRadius) + "_" + fileImage[currentImage].filename;
+
+            std::chrono::duration<double> duration = end - start;
+            newImage.workTime = duration.count() * 1000;
+            newImage.mseValue.b = al.getMSE().b;
+            newImage.mseValue.g = al.getMSE().g;
+            newImage.mseValue.r = al.getMSE().r;
+
+            newImage.psnrValue.b = al.getPSNR().b;
+            newImage.psnrValue.g = al.getPSNR().g;
+            newImage.psnrValue.r = al.getPSNR().r;
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -194,11 +212,23 @@ void MainWindow::drawInterface()
                 }
             }
             std::cout<<"Start haar filter"<<std::endl;
+            auto start = std::chrono::high_resolution_clock::now();
             al.haar();
+            auto end = std::chrono::high_resolution_clock::now();
             std::cout<<"End haar filter"<<std::endl;
 
             imageStruct newImage;
             newImage.filename = "haar_" + fileImage[currentImage].filename;
+
+            std::chrono::duration<double> duration = end - start;
+            newImage.workTime = duration.count() * 1000;
+            newImage.mseValue.b = al.getMSE().b;
+            newImage.mseValue.g = al.getMSE().g;
+            newImage.mseValue.r = al.getMSE().r;
+
+            newImage.psnrValue.b = al.getPSNR().b;
+            newImage.psnrValue.g = al.getPSNR().g;
+            newImage.psnrValue.r = al.getPSNR().r;
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -231,11 +261,23 @@ void MainWindow::drawInterface()
                 }
             }
             std::cout<<"Start new median filter"<<std::endl;
+            auto start = std::chrono::high_resolution_clock::now();
             al.newMedianFilter(newMedianFilterRadius);
+            auto end = std::chrono::high_resolution_clock::now();
             std::cout<<"End new median filter"<<std::endl;
 
             imageStruct newImage;
             newImage.filename = "nmed" + std::to_string(newMedianFilterRadius) + "_" + fileImage[currentImage].filename;
+
+            std::chrono::duration<double> duration = end - start;
+            newImage.workTime = duration.count() * 1000;
+            newImage.mseValue.b = al.getMSE().b;
+            newImage.mseValue.g = al.getMSE().g;
+            newImage.mseValue.r = al.getMSE().r;
+
+            newImage.psnrValue.b = al.getPSNR().b;
+            newImage.psnrValue.g = al.getPSNR().g;
+            newImage.psnrValue.r = al.getPSNR().r;
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -270,11 +312,23 @@ void MainWindow::drawInterface()
                 }
             }
             std::cout<<"Start gaus filter"<<std::endl;
+            auto start = std::chrono::high_resolution_clock::now();
             al.bilateralFilter(gausKernalSize, gausSpatialSigma, gausIntensitySigma);
+            auto end = std::chrono::high_resolution_clock::now();
             std::cout<<"End gaus filter"<<std::endl;
 
             imageStruct newImage;
             newImage.filename = "gb_" + std::to_string(gausKernalSize) + "_" + std::to_string(gausSpatialSigma) + "_" + std::to_string(gausIntensitySigma) + "_" + fileImage[currentImage].filename;
+            
+            std::chrono::duration<double> duration = end - start;
+            newImage.workTime = duration.count() * 1000;
+            newImage.mseValue.b = al.getMSE().b;
+            newImage.mseValue.g = al.getMSE().g;
+            newImage.mseValue.r = al.getMSE().r;
+
+            newImage.psnrValue.b = al.getPSNR().b;
+            newImage.psnrValue.g = al.getPSNR().g;
+            newImage.psnrValue.r = al.getPSNR().r;
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -310,11 +364,24 @@ void MainWindow::drawInterface()
                 }
             }
             std::cout<<"Start gaus range filter"<<std::endl;
+            auto start = std::chrono::high_resolution_clock::now();
             al.bilateralFilterRange(gausRangeKernalSize, gausRangeSpatialSigma, gausRangeSigma);
+            auto end = std::chrono::high_resolution_clock::now();
             std::cout<<"End gaus range filter"<<std::endl;
 
             imageStruct newImage;
             newImage.filename = "gr_" + std::to_string(gausRangeKernalSize) + "_" + std::to_string(gausRangeSpatialSigma) + "_" + std::to_string(gausRangeSigma) + "_" + fileImage[currentImage].filename;
+
+            std::chrono::duration<double> duration = end - start;
+            newImage.workTime = duration.count() * 1000;
+            newImage.mseValue.b = al.getMSE().b;
+            newImage.mseValue.g = al.getMSE().g;
+            newImage.mseValue.r = al.getMSE().r;
+
+            newImage.psnrValue.b = al.getPSNR().b;
+            newImage.psnrValue.g = al.getPSNR().g;
+            newImage.psnrValue.r = al.getPSNR().r;
+
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -585,81 +652,81 @@ void MainWindow::drawExportFile()
         ImGui::End();
     }
 }
-void MainWindow::draw_label(Mat& input_image, std::string label, int left, int top)
-{
-    int baseLine;
-    Size label_size = getTextSize(label, FONT_FACE, FONT_SCALE, THICKNESS, &baseLine);
-    top = max(top, label_size.height);
-    Point tlc = Point(left, top);
-    Point brc = Point(left + label_size.width, top + label_size.height + baseLine);
-    rectangle(input_image, tlc, brc, BLACK, FILLED);
-    putText(input_image, label, Point(left, top + label_size.height), FONT_FACE, FONT_SCALE, YELLOW, THICKNESS);
-}
-std::vector<Mat> MainWindow::pre_process(Mat &input_image, Net &net)
-{
-    Mat blob;
-    blobFromImage(input_image, blob, 1./255., Size(INPUT_WIDTH, INPUT_HEIGHT), Scalar(), true, false);
+// void MainWindow::draw_label(Mat& input_image, std::string label, int left, int top)
+// {
+//     int baseLine;
+//     Size label_size = getTextSize(label, FONT_FACE, FONT_SCALE, THICKNESS, &baseLine);
+//     top = max(top, label_size.height);
+//     Point tlc = Point(left, top);
+//     Point brc = Point(left + label_size.width, top + label_size.height + baseLine);
+//     rectangle(input_image, tlc, brc, BLACK, FILLED);
+//     putText(input_image, label, Point(left, top + label_size.height), FONT_FACE, FONT_SCALE, YELLOW, THICKNESS);
+// }
+// std::vector<Mat> MainWindow::pre_process(Mat &input_image, Net &net)
+// {
+//     Mat blob;
+//     blobFromImage(input_image, blob, 1./255., Size(INPUT_WIDTH, INPUT_HEIGHT), Scalar(), true, false);
  
-    net.setInput(blob);
+//     net.setInput(blob);
  
-    std::vector<Mat> outputs;
-    net.forward(outputs, net.getUnconnectedOutLayersNames());
+//     std::vector<Mat> outputs;
+//     net.forward(outputs, net.getUnconnectedOutLayersNames());
  
-    return outputs;
-}
-Mat MainWindow::post_process(Mat &input_image, std::vector<Mat> &outputs, const std::vector<std::string> &class_name)
-{
-    std::vector<int> class_ids;
-    std::vector<float> confidences;
-    std::vector<Rect> boxes;
-    float x_factor = input_image.cols / INPUT_WIDTH;
-    float y_factor = input_image.rows / INPUT_HEIGHT;
-    float *data = (float *)outputs[0].data;
-    const int dimensions = 85;
-    const int rows = 25200;
-    for (int i = 0; i < rows; ++i)
-    {
-        float confidence = data[4];
-        if (confidence >= CONFIDENCE_THRESHOLD)
-        {
-            float * classes_scores = data + 5;
-            Mat scores(1, class_name.size(), CV_32FC1, classes_scores);
-            Point class_id;
-            double max_class_score;
-            minMaxLoc(scores, 0, &max_class_score, 0, &class_id);
-            if (max_class_score > SCORE_THRESHOLD)
-            {
-                confidences.push_back(confidence);
-                class_ids.push_back(class_id.x);
-                float cx = data[0];
-                float cy = data[1];
-                float w = data[2];
-                float h = data[3];
-                int left = int((cx - 0.5 * w) * x_factor);
-                int top = int((cy - 0.5 * h) * y_factor);
-                int width = int(w * x_factor);
-                int height = int(h * y_factor);
-                boxes.push_back(Rect(left, top, width, height));
-            }
-        }
-        data += 85;
-    }
-    std::vector<int> indices;
-    NMSBoxes(boxes, confidences, SCORE_THRESHOLD, NMS_THRESHOLD, indices);
-    for (int i = 0; i < indices.size(); i++)
-    {
-        int idx = indices[i];
-        Rect box = boxes[idx];
-        int left = box.x;
-        int top = box.y;
-        int width = box.width;
-        int height = box.height;
-        rectangle(input_image, Point(left, top), Point(left + width, top + height), BLUE, 3*THICKNESS);
-        std::string label = format("%.2f", confidences[idx]);
-        label = class_name[class_ids[idx]] + ":" + label;
-        draw_label(input_image, label, left, top);
-    }
-    return input_image;
-}
+//     return outputs;
+// }
+// Mat MainWindow::post_process(Mat &input_image, std::vector<Mat> &outputs, const std::vector<std::string> &class_name)
+// {
+//     std::vector<int> class_ids;
+//     std::vector<float> confidences;
+//     std::vector<Rect> boxes;
+//     float x_factor = input_image.cols / INPUT_WIDTH;
+//     float y_factor = input_image.rows / INPUT_HEIGHT;
+//     float *data = (float *)outputs[0].data;
+//     const int dimensions = 85;
+//     const int rows = 25200;
+//     for (int i = 0; i < rows; ++i)
+//     {
+//         float confidence = data[4];
+//         if (confidence >= CONFIDENCE_THRESHOLD)
+//         {
+//             float * classes_scores = data + 5;
+//             Mat scores(1, class_name.size(), CV_32FC1, classes_scores);
+//             Point class_id;
+//             double max_class_score;
+//             minMaxLoc(scores, 0, &max_class_score, 0, &class_id);
+//             if (max_class_score > SCORE_THRESHOLD)
+//             {
+//                 confidences.push_back(confidence);
+//                 class_ids.push_back(class_id.x);
+//                 float cx = data[0];
+//                 float cy = data[1];
+//                 float w = data[2];
+//                 float h = data[3];
+//                 int left = int((cx - 0.5 * w) * x_factor);
+//                 int top = int((cy - 0.5 * h) * y_factor);
+//                 int width = int(w * x_factor);
+//                 int height = int(h * y_factor);
+//                 boxes.push_back(Rect(left, top, width, height));
+//             }
+//         }
+//         data += 85;
+//     }
+//     std::vector<int> indices;
+//     NMSBoxes(boxes, confidences, SCORE_THRESHOLD, NMS_THRESHOLD, indices);
+//     for (int i = 0; i < indices.size(); i++)
+//     {
+//         int idx = indices[i];
+//         Rect box = boxes[idx];
+//         int left = box.x;
+//         int top = box.y;
+//         int width = box.width;
+//         int height = box.height;
+//         rectangle(input_image, Point(left, top), Point(left + width, top + height), BLUE, 3*THICKNESS);
+//         std::string label = format("%.2f", confidences[idx]);
+//         label = class_name[class_ids[idx]] + ":" + label;
+//         draw_label(input_image, label, left, top);
+//     }
+//     return input_image;
+// }
 
 

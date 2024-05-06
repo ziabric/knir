@@ -377,5 +377,64 @@ void algor::bilateralFilterRange(int kernelSize, double spatialSigma, double ran
     }
 }
 
+BGRValued algor::getMSE()
+{
+    BGRValued output;
+    if (!origImageAvailable() || !modImageAvailable() ) return output;
 
+    for (int i = 0; i < width_ * height_; i += 1)
+    {
+        output.b += (origData_[i].b - modData_[i].b) * (origData_[i].b - modData_[i].b);
+        output.g += (origData_[i].g - modData_[i].g) * (origData_[i].g - modData_[i].g);
+        output.r += (origData_[i].r - modData_[i].r) * (origData_[i].r - modData_[i].r);
+    }
+    output.b /= (width_*height_);
+    output.g /= (width_*height_);
+    output.r /= (width_*height_);
+    return output;
+}
+
+BGRValued algor::getPSNR()
+{
+    BGRValued output;
+    if (!origImageAvailable() || !modImageAvailable() ) return output;
+
+    for (int i = 0; i < width_ * height_; i += 1)
+    {
+        output.b += (origData_[i].b - modData_[i].b) * (origData_[i].b - modData_[i].b);
+        output.g += (origData_[i].g - modData_[i].g) * (origData_[i].g - modData_[i].g);
+        output.r += (origData_[i].r - modData_[i].r) * (origData_[i].r - modData_[i].r);
+    }
+    output.b /= (width_*height_);
+    output.g /= (width_*height_);
+    output.r /= (width_*height_);
+
+    output.b = (20 * std::log10(255/sqrt(output.b)));
+    output.g = (20 * std::log10(255/sqrt(output.g)));
+    output.r = (20 * std::log10(255/sqrt(output.r)));
+    return output;
+}
+
+BGRValued algor::getSSIM(int radius, int c1, int c2, int c3)
+{
+    // const double C1 = 6.5025, C2 = 58.5225;
+
+    // // Вычисляем средние значения
+    // double mu1 = average(origData_, width_*height_);
+    // double mu2 = average(img2, width_*height_);
+
+    // // Вычисляем дисперсии
+    // double sigma1 = variance(origData_, width_*height_, mu1);
+    // double sigma2 = variance(img2, width_*height_, mu2);
+
+    // // Вычисляем ковариацию
+    // double sigma12 = covariance(origData_, img2, width_*height_, mu1, mu2);
+
+    // // Вычисляем SSIM
+    // double ssim_numerator = (2 * mu1 * mu2 + C1) * (2 * sigma12 + C2);
+    // double ssim_denominator = (mu1 * mu1 + mu2 * mu2 + C1) * (sigma1 + sigma2 + C2);
+    // return ssim_numerator / ssim_denominator;
+    BGRValued output;
+    return output;
+}
 

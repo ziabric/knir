@@ -2,7 +2,8 @@
 #define ALGOR_H
 
 #include <memory>
-#include <algorithm>
+// #include <algorithm>
+#include <cmath>
 
 /**
  * @brief Storing pixel values
@@ -12,6 +13,13 @@ struct BGRValue
     unsigned int b = 0;
     unsigned int g = 0;
     unsigned int r = 0;
+};
+
+struct BGRValued 
+{
+    double b = 0;
+    double g = 0;
+    double r = 0;
 };
 
 // 1 -- columns -> rows
@@ -79,6 +87,12 @@ public:
     /// @param spatialSigma 
     /// @param rangeSigma 
     void bilateralFilterRange(int kernelSize, double spatialSigma, double rangeSigma);
+
+    BGRValued getMSE();
+
+    BGRValued getPSNR();
+
+    BGRValued getSSIM(int radius, int c1, int c2, int c3);
 protected:
     /// @brief Search median value in array
     /// @param arr Array of median values
@@ -126,6 +140,30 @@ protected:
     double gaussianRange(double x, double sigma);
 
     double power(double base, int exponent);
+
+    double average(const double arr[], int size) {
+        double sum = 0.0;
+        for (int i = 0; i < size; i++) {
+            sum += arr[i];
+        }
+        return sum / size;
+    }
+
+    double variance(const double arr[], int size, double mean) {
+        double sum = 0.0;
+        for (int i = 0; i < size; i++) {
+            sum += (arr[i] - mean) * (arr[i] - mean);
+        }
+        return sum / size;
+    }
+
+    double covariance(const double arr1[], const double arr2[], int size, double mean1, double mean2) {
+        double sum = 0.0;
+        for (int i = 0; i < size; i++) {
+            sum += (arr1[i] - mean1) * (arr2[i] - mean2);
+        }
+        return sum / size;
+    }
 private:
     /// @brief Image Height
     unsigned int height_;

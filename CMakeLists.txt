@@ -11,7 +11,7 @@ include_directories( ${PROJECT_SOURCE_DIR}/algor )
 include_directories( ${PROJECT_SOURCE_DIR}/tests )
 
 find_package(SFML COMPONENTS system graphics audio network REQUIRED)
-find_package(OpenCV REQUIRED)
+# find_package(OpenCV REQUIRED)
 
 set(IMGUI
         imgui/imconfig.h
