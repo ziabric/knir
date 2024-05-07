@@ -430,9 +430,9 @@ BGRValued algor::getSSIM(int radius, int c1, int c2)
     // return ssim_numerator / ssim_denominator;
     BGRValued output;
 
-    output.b = (2 * mu1.b * mu2.b + c1) * (2 * sigma12.b + c2) / (mu1.b * mu1.b + mu2.b * mu2.b + c1) * (sigma1.b + sigma2.b + c2);
-    output.g = (2 * mu1.g * mu2.g + c1) * (2 * sigma12.g + c2) / (mu1.g * mu1.g + mu2.g * mu2.g + c1) * (sigma1.g + sigma2.g + c2);
-    output.r = (2 * mu1.r * mu2.r + c1) * (2 * sigma12.r + c2) / (mu1.r * mu1.r + mu2.r * mu2.r + c1) * (sigma1.r + sigma2.r + c2);
+    output.b = ((2 * mu1.b * mu2.b + c1) * (2 * sigma12.b + c2)) / ((mu1.b * mu1.b + mu2.b * mu2.b + c1) * (sigma1.b + sigma2.b + c2));
+    output.g = ((2 * mu1.g * mu2.g + c1) * (2 * sigma12.g + c2)) / ((mu1.g * mu1.g + mu2.g * mu2.g + c1) * (sigma1.g + sigma2.g + c2));
+    output.r = ((2 * mu1.r * mu2.r + c1) * (2 * sigma12.r + c2)) / ((mu1.r * mu1.r + mu2.r * mu2.r + c1) * (sigma1.r + sigma2.r + c2));
 
     return output;
 }

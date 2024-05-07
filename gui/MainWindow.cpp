@@ -55,6 +55,7 @@ int MainWindow::mainloop()
             drawInterface();
             drawExportFile();
             drawFilesystem();
+            drawMetricsWindow();
             drawImage();
 
             ImGui::PopFont();
@@ -75,6 +76,12 @@ void MainWindow::drawInterface()
     if ( ImGui::ImageButton(filesystemIcon, {35, 35}) ) 
     {
         filesystemOpenFlag = true;
+    }
+    ImGui::SameLine();
+    if ( ImGui::Button("Show metrics") )
+    {
+
+        showMetricsWindowFlag = true;
     }
     if (currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "") 
     {
@@ -584,6 +591,36 @@ void MainWindow::drawExportFile()
                 fileImage[currentImage].image.saveToFile(currentPath.string() + "/" + exportFileName);
             }
         }
+        ImGui::End();
+    }
+}
+void MainWindow::drawMetricsWindow()
+{
+    if (showMetricsWindowFlag && ImGui::Begin("Metrics", &showMetricsWindowFlag, ImGuiWindowFlags_NoCollapse))
+    {
+        ImGui::Columns(2);
+
+        if (ImGui::BeginChild("OrigImage", {}, true))
+        {
+            ImGui::Text("First image");
+            ImGui::Separator();
+
+            ImGui::EndChild();
+        }
+
+        ImGui::NextColumn();
+
+        if (ImGui::BeginChild("ModImage", {}, true))
+        {
+            ImGui::Text("Second image");
+            ImGui::Separator();
+
+
+            ImGui::EndChild();
+        }
+
+        ImGui::Columns(1);
+
         ImGui::End();
     }
 }
