@@ -2,7 +2,6 @@
 #define ALGOR_H
 
 #include <memory>
-// #include <algorithm>
 #include <cmath>
 
 /**
