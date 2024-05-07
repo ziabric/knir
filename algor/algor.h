@@ -92,7 +92,7 @@ public:
 
     BGRValued getPSNR();
 
-    BGRValued getSSIM(int radius, int c1, int c2, int c3);
+    BGRValued getSSIM(int radius, int c1, int c2);
 protected:
     /// @brief Search median value in array
     /// @param arr Array of median values
@@ -141,29 +141,12 @@ protected:
 
     double power(double base, int exponent);
 
-    double average(const double arr[], int size) {
-        double sum = 0.0;
-        for (int i = 0; i < size; i++) {
-            sum += arr[i];
-        }
-        return sum / size;
-    }
+    BGRValued average(BGRValue* arr, int size);
 
-    double variance(const double arr[], int size, double mean) {
-        double sum = 0.0;
-        for (int i = 0; i < size; i++) {
-            sum += (arr[i] - mean) * (arr[i] - mean);
-        }
-        return sum / size;
-    }
+    BGRValued variance(BGRValue* arr, int size, BGRValued mean);
 
-    double covariance(const double arr1[], const double arr2[], int size, double mean1, double mean2) {
-        double sum = 0.0;
-        for (int i = 0; i < size; i++) {
-            sum += (arr1[i] - mean1) * (arr2[i] - mean2);
-        }
-        return sum / size;
-    }
+    BGRValued covariance(BGRValue* arr1,  BGRValue* arr2, int size, BGRValued mean1, BGRValued mean2);
+
 private:
     /// @brief Image Height
     unsigned int height_;

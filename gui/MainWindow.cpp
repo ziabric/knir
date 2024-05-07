@@ -138,16 +138,21 @@ void MainWindow::drawInterface()
         ImGui::Separator();
         ImGui::Text("%s", std::string("PSNR => b: " + std::to_string(fileImage[currentImage].psnrValue.b) + " g: " + std::to_string(fileImage[currentImage].psnrValue.g) + " r: " + std::to_string(fileImage[currentImage].psnrValue.r)).c_str());
         ImGui::Separator();
-        ImGui::Text("%s", std::string("Width  -- " + std::to_string(fileImage[currentImage].image.getSize().x)).c_str());
-        ImGui::Text("%s", std::string("Height -- " + std::to_string(fileImage[currentImage].image.getSize().y)).c_str());
+        ImGui::Text("%s", std::string("SSIM => b: " + std::to_string(fileImage[currentImage].ssimValue.b) + " g: " + std::to_string(fileImage[currentImage].ssimValue.g) + " r: " + std::to_string(fileImage[currentImage].ssimValue.r)).c_str());
+        ImGui::Separator();
+        ImGui::Text("%s", std::string("Width  => " + std::to_string(fileImage[currentImage].image.getSize().x)).c_str());
+        ImGui::Text("%s", std::string("Height => " + std::to_string(fileImage[currentImage].image.getSize().y)).c_str());
+        ImGui::Separator();
         ImGui::Text("Point color");
         ImGui::InputInt2("##PointPos", fileImage[currentImage].pixelPos);
         if ( fileImage[currentImage].pixelPos[0] >= 0 && fileImage[currentImage].pixelPos[0] < fileImage[currentImage].image.getSize().x 
             && fileImage[currentImage].pixelPos[1] >= 0 && fileImage[currentImage].pixelPos[1] < fileImage[currentImage].image.getSize().y )
         {
-            ImGui::Text("%s", std::string("B -- " + std::to_string(fileImage[currentImage].image.getPixel(fileImage[currentImage].pixelPos[0], fileImage[currentImage].pixelPos[1]).b)).c_str());
-            ImGui::Text("%s", std::string("G -- " + std::to_string(fileImage[currentImage].image.getPixel(fileImage[currentImage].pixelPos[0], fileImage[currentImage].pixelPos[1]).g)).c_str());
-            ImGui::Text("%s", std::string("R -- " + std::to_string(fileImage[currentImage].image.getPixel(fileImage[currentImage].pixelPos[0], fileImage[currentImage].pixelPos[1]).r)).c_str());
+            ImGui::Text("%s", std::string("B: " + std::to_string(fileImage[currentImage].image.getPixel(fileImage[currentImage].pixelPos[0], fileImage[currentImage].pixelPos[1]).b)).c_str());
+            ImGui::SameLine();
+            ImGui::Text("%s", std::string(" G: " + std::to_string(fileImage[currentImage].image.getPixel(fileImage[currentImage].pixelPos[0], fileImage[currentImage].pixelPos[1]).g)).c_str());
+            ImGui::SameLine();
+            ImGui::Text("%s", std::string(" R: " + std::to_string(fileImage[currentImage].image.getPixel(fileImage[currentImage].pixelPos[0], fileImage[currentImage].pixelPos[1]).r)).c_str());
         }
         ImGui::Separator();
         ImGui::Text("Median");
@@ -175,13 +180,9 @@ void MainWindow::drawInterface()
 
             std::chrono::duration<double> duration = end - start;
             newImage.workTime = duration.count() * 1000;
-            newImage.mseValue.b = al.getMSE().b;
-            newImage.mseValue.g = al.getMSE().g;
-            newImage.mseValue.r = al.getMSE().r;
-
-            newImage.psnrValue.b = al.getPSNR().b;
-            newImage.psnrValue.g = al.getPSNR().g;
-            newImage.psnrValue.r = al.getPSNR().r;
+            newImage.mseValue = al.getMSE();
+            newImage.psnrValue = al.getPSNR();
+            newImage.ssimValue = al.getSSIM(10, 1, 1);
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -222,13 +223,9 @@ void MainWindow::drawInterface()
 
             std::chrono::duration<double> duration = end - start;
             newImage.workTime = duration.count() * 1000;
-            newImage.mseValue.b = al.getMSE().b;
-            newImage.mseValue.g = al.getMSE().g;
-            newImage.mseValue.r = al.getMSE().r;
-
-            newImage.psnrValue.b = al.getPSNR().b;
-            newImage.psnrValue.g = al.getPSNR().g;
-            newImage.psnrValue.r = al.getPSNR().r;
+            newImage.mseValue = al.getMSE();
+            newImage.psnrValue = al.getPSNR();
+            newImage.ssimValue = al.getSSIM(10, 1, 1);
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -271,13 +268,9 @@ void MainWindow::drawInterface()
 
             std::chrono::duration<double> duration = end - start;
             newImage.workTime = duration.count() * 1000;
-            newImage.mseValue.b = al.getMSE().b;
-            newImage.mseValue.g = al.getMSE().g;
-            newImage.mseValue.r = al.getMSE().r;
-
-            newImage.psnrValue.b = al.getPSNR().b;
-            newImage.psnrValue.g = al.getPSNR().g;
-            newImage.psnrValue.r = al.getPSNR().r;
+            newImage.mseValue = al.getMSE();
+            newImage.psnrValue = al.getPSNR();
+            newImage.ssimValue = al.getSSIM(10, 1, 1);
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -322,13 +315,9 @@ void MainWindow::drawInterface()
             
             std::chrono::duration<double> duration = end - start;
             newImage.workTime = duration.count() * 1000;
-            newImage.mseValue.b = al.getMSE().b;
-            newImage.mseValue.g = al.getMSE().g;
-            newImage.mseValue.r = al.getMSE().r;
-
-            newImage.psnrValue.b = al.getPSNR().b;
-            newImage.psnrValue.g = al.getPSNR().g;
-            newImage.psnrValue.r = al.getPSNR().r;
+            newImage.mseValue = al.getMSE();
+            newImage.psnrValue = al.getPSNR();
+            newImage.ssimValue = al.getSSIM(10, 1, 1);
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -374,14 +363,9 @@ void MainWindow::drawInterface()
 
             std::chrono::duration<double> duration = end - start;
             newImage.workTime = duration.count() * 1000;
-            newImage.mseValue.b = al.getMSE().b;
-            newImage.mseValue.g = al.getMSE().g;
-            newImage.mseValue.r = al.getMSE().r;
-
-            newImage.psnrValue.b = al.getPSNR().b;
-            newImage.psnrValue.g = al.getPSNR().g;
-            newImage.psnrValue.r = al.getPSNR().r;
-
+            newImage.mseValue = al.getMSE();
+            newImage.psnrValue = al.getPSNR();
+            newImage.ssimValue = al.getSSIM(10, 1, 1);
 
             newImage.image = fileImage[currentImage].image;
             for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
@@ -461,7 +445,6 @@ void MainWindow::drawImage()
             //     fileImage[i].scale += (ImGui::GetIO().MouseWheel > 0) ? scaleStep/10 : -scaleStep/10;
             // }
 
-            
             ImGui::SetWindowSize({(float)fileImage[i].image.getSize().x + 25, (float)fileImage[i].image.getSize().y + 40}, ImGuiCond_Once);
 
             ImGui::End();
