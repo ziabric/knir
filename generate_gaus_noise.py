@@ -14,9 +14,9 @@ def add_gaussian_noise(image, mean=0, std=2):
     noisy_image = cv2.add(image, gaussian_noise.astype(image.dtype))
     return noisy_image
 
-image_path = './examples/city_people.png'
+image_path = './examples/face/face3.png'
 image = cv2.imread(image_path)
 
 noisy_image = add_gaussian_noise(image)
 
-cv2.imwrite('./examples/new_city_people.png', noisy_image)
+cv2.imwrite('./examples/city/g_face3.png', noisy_image)

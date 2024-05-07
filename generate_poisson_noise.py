@@ -7,8 +7,8 @@ def add_poisson_noise(image):
     noisy_normalized = (255 * (noisy - np.min(noisy)) / np.ptp(noisy)).astype(np.uint8)
     return noisy_normalized
 
-image = cv2.imread('examples/p_city_1000.png')
+image = cv2.imread('examples/face/p_face3.png')
 
 noisy_image = add_poisson_noise(image)
 
-cv2.imwrite('examples/pp_city_1000.png', noisy_image)
+cv2.imwrite('examples/face/p_face3.png', noisy_image)
