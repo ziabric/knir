@@ -600,26 +600,70 @@ void MainWindow::drawMetricsWindow()
     {
         ImGui::Columns(2);
 
-        if (ImGui::BeginChild("OrigImage", {}, true))
+        if (ImGui::BeginChild("OrigImage", ImVec2(0, ImGui::GetWindowHeight() - 150), true))
         {
-            ImGui::Text("First image");
+            ImGui::Text("Orig image");
             ImGui::Separator();
+
+            for (int i = 0; i < fileImage.size(); i += 1) 
+            {
+                if (ImGui::RadioButton(std::string(fileImage[i].filename).c_str(), i == origImageM)) origImageM = i;
+            }
 
             ImGui::EndChild();
         }
 
         ImGui::NextColumn();
 
-        if (ImGui::BeginChild("ModImage", {}, true))
+        if (ImGui::BeginChild("ModImage", ImVec2(0, ImGui::GetWindowHeight() - 150), true))
         {
-            ImGui::Text("Second image");
+            ImGui::Text("Mod image");
             ImGui::Separator();
 
+            for (int i = 0; i < fileImage.size(); i += 1) 
+            {
+                if (ImGui::RadioButton(std::string(fileImage[i].filename).c_str(), i == modImageM)) modImageM = i;
+            }
 
             ImGui::EndChild();
         }
 
         ImGui::Columns(1);
+
+        if (ImGui::Button("Get metrics"))
+        {
+            al.clearData();
+            
+            al.setOrigImageSize(fileImage[modImageM].image.getSize().x, fileImage[modImageM].image.getSize().y);
+            for (size_t i = 0; i < fileImage[modImageM].image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < fileImage[modImageM].image.getSize().y; j += 1 )
+                {
+                    al.setOrigImagePixel(i, j, {(unsigned int)fileImage[modImageM].image.getPixel(i, j).b, (unsigned int)fileImage[modImageM].image.getPixel(i, j).g, (unsigned int)fileImage[modImageM].image.getPixel(i, j).r});
+                }
+            }
+            
+            al.swapOrigMod();
+
+            al.setOrigImageSize(fileImage[origImageM].image.getSize().x, fileImage[origImageM].image.getSize().y);
+            for (size_t i = 0; i < fileImage[origImageM].image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < fileImage[origImageM].image.getSize().y; j += 1 )
+                {
+                    al.setOrigImagePixel(i, j, {(unsigned int)fileImage[origImageM].image.getPixel(i, j).b, (unsigned int)fileImage[origImageM].image.getPixel(i, j).g, (unsigned int)fileImage[origImageM].image.getPixel(i, j).r});
+                }
+            }
+
+
+            metricsMSE = al.getMSE();
+            metricsPSNR = al.getPSNR();
+            metricsSSIM = al.getSSIM(10, 1, 1);
+        }
+        ImGui::Text("%s", std::string("MSE => b: " + std::to_string(metricsMSE.b) + " g: " + std::to_string(metricsMSE.g) + " r: " + std::to_string(metricsMSE.r)).c_str());
+        ImGui::Separator();
+        ImGui::Text("%s", std::string("PSNR => b: " + std::to_string(metricsPSNR.b) + " g: " + std::to_string(metricsPSNR.g) + " r: " + std::to_string(metricsPSNR.r)).c_str());
+        ImGui::Separator();
+        ImGui::Text("%s", std::string("SSIM => b: " + std::to_string(metricsSSIM.b) + " g: " + std::to_string(metricsSSIM.g) + " r: " + std::to_string(metricsSSIM.r)).c_str());
 
         ImGui::End();
     }

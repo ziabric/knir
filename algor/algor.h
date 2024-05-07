@@ -14,6 +14,10 @@ struct BGRValue
     unsigned int r = 0;
 };
 
+/**
+ * @brief 
+ * 
+ */
 struct BGRValued 
 {
     double b = 0;
@@ -86,12 +90,32 @@ public:
     /// @param spatialSigma 
     /// @param rangeSigma 
     void bilateralFilterRange(int kernelSize, double spatialSigma, double rangeSigma);
-
+    /**
+     * @brief 
+     * 
+     * @return BGRValued 
+     */
     BGRValued getMSE();
-
+    /**
+     * @brief 
+     * 
+     * @return BGRValued 
+     */
     BGRValued getPSNR();
-
+    /**
+     * @brief 
+     * 
+     * @param radius 
+     * @param c1 
+     * @param c2 
+     * @return BGRValued 
+     */
     BGRValued getSSIM(int radius, int c1, int c2);
+    /**
+     * @brief 
+     * 
+     */
+    void swapOrigMod();
 protected:
     /// @brief Search median value in array
     /// @param arr Array of median values
@@ -129,23 +153,77 @@ protected:
     /// @param list 
     /// @param listLength 
     void bubbleSort(unsigned int* list, int listLength);
-    
+    /**
+     * @brief 
+     * 
+     * @param arr 
+     * @param low 
+     * @param high 
+     * @return int 
+     */
     int partition(unsigned int* arr, int low, int high);
-    
+    /**
+     * @brief 
+     * 
+     * @param arr 
+     * @param low 
+     * @param high 
+     * @return * void 
+     */
     void quickSort(unsigned int* arr, int low, int high);
-
+    /**
+     * @brief 
+     * 
+     * @param x 
+     * @param y 
+     * @param sigma 
+     * @return double 
+     */
     double gaussianBase(double x, double y, double sigma);
-
+    /**
+     * @brief 
+     * 
+     * @param x 
+     * @param sigma 
+     * @return double 
+     */
     double gaussianRange(double x, double sigma);
-
+    /**
+     * @brief 
+     * 
+     * @param base 
+     * @param exponent 
+     * @return double 
+     */
     double power(double base, int exponent);
-
+    /**
+     * @brief 
+     * 
+     * @param arr 
+     * @param size 
+     * @return BGRValued 
+     */
     BGRValued average(BGRValue* arr, int size);
-
+    /**
+     * @brief 
+     * 
+     * @param arr 
+     * @param size 
+     * @param mean 
+     * @return BGRValued 
+     */
     BGRValued variance(BGRValue* arr, int size, BGRValued mean);
-
+    /**
+     * @brief 
+     * 
+     * @param arr1 
+     * @param arr2 
+     * @param size 
+     * @param mean1 
+     * @param mean2 
+     * @return BGRValued 
+     */
     BGRValued covariance(BGRValue* arr1,  BGRValue* arr2, int size, BGRValued mean1, BGRValued mean2);
-
 private:
     /// @brief Image Height
     unsigned int height_;

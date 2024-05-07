@@ -181,6 +181,9 @@ private:
     bool showMetricsWindowFlag = false;
     int origImageM = 0;
     int modImageM = 0;
+    BGRValued metricsMSE;
+    BGRValued metricsPSNR;
+    BGRValued metricsSSIM;
 
     const std::string base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
     std::string filesystemIconString = "iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAABHNCSVQICAgIfAhkiAAAAAlwSFlzAAAAsQAAALEBxi1JjQAAABl0RVh0U29mdHdhcmUAd3d3Lmlua3NjYXBlLm9yZ5vuPBoAAAG2SURBVEiJ3ZY9TxRRFIafM/fysXwMmC2MRI3B4GJtQkJijP+ASixMoNSfgJYk/AYLCmNHDBYWdqCJ0QgFJa6EAjrYEORjs0M2zJ1jsbNkN+zCzsA2vNWdc885z7n3nrkz0GZJdaCf7mZKlHMhamodDPak78VuXgRNDdAPD7qLmWAdYbihl7KOp2/8yb2fqQDHi9lRnMlf4qso85Erzwy+OjpIBCgu3Hms4v60GBAAf0GabpnCkv+yMHMOoP05NPus1eIaF7D/AyluEIkMD04WtmztpHv0Dr01djVA9il2bRoTed0AdQBMJlkyd4y4Ur1NA8Qz4CrPtkHcpfLCf/QU3tNZ/AWNunfoHpEL38LOVEJARNfBV3r2PiJR6UJP8exziFfQMeCPiCd0Hn6G4HvTIHuSx5S3WypF4lfYAnT5/lylAVcrTXiN8mLewPWmPQdon24IQDXVTXyhqjktgIicps50ewJsTY9oCDsLCNHpGeBKuv8aOrL1tsIXiK+Qtp9BdQXpD2FzFkxvjSECF5zljAHyDfRhKsDhSpMJXYbqN1kRfj/J4WxvE+9kMmGJ8bWNtD8KifQf/hWHuHgPyk4AAAAASUVORK5CYII=";

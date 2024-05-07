@@ -425,9 +425,6 @@ BGRValued algor::getSSIM(int radius, int c1, int c2)
 
     BGRValued sigma12 = covariance(origData_.get(), modData_.get(), width_*height_, mu1, mu2);
 
-    // double ssim_numerator = (2 * mu1 * mu2 + c1) * (2 * sigma12 + c2);
-    // double ssim_denominator = (mu1 * mu1 + mu2 * mu2 + c1) * (sigma1 + sigma2 + c2);
-    // return ssim_numerator / ssim_denominator;
     BGRValued output;
 
     output.b = ((2 * mu1.b * mu2.b + c1) * (2 * sigma12.b + c2)) / ((mu1.b * mu1.b + mu2.b * mu2.b + c1) * (sigma1.b + sigma2.b + c2));
@@ -437,7 +434,8 @@ BGRValued algor::getSSIM(int radius, int c1, int c2)
     return output;
 }
 
-BGRValued algor::average(BGRValue* arr, int size) {
+BGRValued algor::average(BGRValue* arr, int size) 
+{
     BGRValued sum;
     for (int i = 0; i < size; i++) {
         sum.b += arr[i].b;
@@ -450,7 +448,8 @@ BGRValued algor::average(BGRValue* arr, int size) {
     return sum;
 }
 
-BGRValued algor::variance(BGRValue* arr, int size, BGRValued mean) {
+BGRValued algor::variance(BGRValue* arr, int size, BGRValued mean) 
+{
     BGRValued sum;
     for (int i = 0; i < size; i++) {
         sum.b += (arr[i].b - mean.b) * (arr[i].b - mean.b);
@@ -463,7 +462,8 @@ BGRValued algor::variance(BGRValue* arr, int size, BGRValued mean) {
     return sum;
 }
 
-BGRValued algor::covariance(BGRValue* arr1,  BGRValue* arr2, int size, BGRValued mean1, BGRValued mean2) {
+BGRValued algor::covariance(BGRValue* arr1,  BGRValue* arr2, int size, BGRValued mean1, BGRValued mean2) 
+{
     BGRValued sum;
     for (int i = 0; i < size; i++) {
         sum.b += (arr1[i].b - mean1.b) * (arr2[i].b - mean2.b);
@@ -474,4 +474,9 @@ BGRValued algor::covariance(BGRValue* arr1,  BGRValue* arr2, int size, BGRValued
     sum.g/=size;
     sum.r/=size;
     return sum;
+}
+
+void algor::swapOrigMod()
+{
+    modData_.swap(origData_);
 }
