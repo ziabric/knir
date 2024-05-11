@@ -17,7 +17,7 @@ size(width_, height_)
     tmp = base64_decode(detectIconString);
     detectIcon.loadFromMemory(tmp.data(), tmp.size());
     tmp = base64_decode(mainIconString);
-    // mainIcon.loadFromMemory(tmp.data(), tmp.size());
+    mainIcon.loadFromMemory(tmp.data(), tmp.size());
     // window->setIcon(64, 64, tmp.data());
 }
 MainWindow::~MainWindow()
@@ -78,10 +78,9 @@ void MainWindow::drawInterface()
         filesystemOpenFlag = true;
     }
     ImGui::SameLine();
-    if ( ImGui::Button("Show metrics") )
+    if ( ImGui::ImageButton(mainIcon, {35,35}) )
     {
-
-        showMetricsWindowFlag = true;
+        if (fileImage.size() > 0) showMetricsWindowFlag = true;
     }
     if (currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "") 
     {
@@ -263,8 +262,8 @@ void MainWindow::drawInterface()
         ImGui::Separator();
         ImGui::Text("Bilateral Gaus");
         ImGui::SliderInt("Kernal##gaus", &gausKernalSize, 1, 50);
-        ImGui::SliderInt("Spatial_k##gaus", &gausSpatialSigma, 1, 50);
-        ImGui::SliderInt("Intensity_k##gaus", &gausIntensitySigma, 1, 50);
+        ImGui::SliderInt("Spatial_k##gaus", &gausSpatialSigma, 1, 500);
+        ImGui::SliderInt("Intensity_k##gaus", &gausIntensitySigma, 1, 500);
         if ( ImGui::Button("Start##gausBase") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
         {
             std::cout<<"Start"<<std::endl;
@@ -655,15 +654,16 @@ void MainWindow::drawMetricsWindow()
             }
 
 
-            metricsMSE = al.getMSE();
-            metricsPSNR = al.getPSNR();
-            metricsSSIM = al.getSSIM(10, 1, 1);
+            metricsMSE.b = (al.getMSE().b + al.getMSE().g + al.getMSE().r) / 3;
+            metricsPSNR.b = (al.getPSNR().b + al.getPSNR().g + al.getPSNR().r) / 3;
+            metricsSSIM.b = (al.getSSIM(10, 1, 1).b + al.getSSIM(10, 1, 1).g + al.getSSIM(10, 1, 1).r)/ 3;
         }
-        ImGui::Text("%s", std::string("MSE => b: " + std::to_string(metricsMSE.b) + " g: " + std::to_string(metricsMSE.g) + " r: " + std::to_string(metricsMSE.r)).c_str());
         ImGui::Separator();
-        ImGui::Text("%s", std::string("PSNR => b: " + std::to_string(metricsPSNR.b) + " g: " + std::to_string(metricsPSNR.g) + " r: " + std::to_string(metricsPSNR.r)).c_str());
+        ImGui::Text("%s", std::string("MSE => " + std::to_string(metricsMSE.b)).c_str());
         ImGui::Separator();
-        ImGui::Text("%s", std::string("SSIM => b: " + std::to_string(metricsSSIM.b) + " g: " + std::to_string(metricsSSIM.g) + " r: " + std::to_string(metricsSSIM.r)).c_str());
+        ImGui::Text("%s", std::string("PSNR => " + std::to_string(metricsPSNR.b)).c_str());
+        ImGui::Separator();
+        ImGui::Text("%s", std::string("SSIM => " + std::to_string(metricsSSIM.b)).c_str());
 
         ImGui::End();
     }
