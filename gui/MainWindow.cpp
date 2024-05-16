@@ -309,8 +309,8 @@ void MainWindow::drawInterface()
         
         ImGui::Separator();
         ImGui::Text("Bilateral Gaus range");
-        ImGui::SliderInt("Kernal##gausRange", &gausRangeKernalSize, 1, 50);
-        ImGui::SliderInt("Spatial_k##gausRange", &gausRangeSpatialSigma, 1, 50);
+        ImGui::SliderInt("Kernal##gausRange", &gausRangeKernalSize, 1, 500);
+        ImGui::SliderInt("Spatial_k##gausRange", &gausRangeSpatialSigma, 1, 500);
         ImGui::SliderInt("Range_k##gausRange", &gausRangeSigma, 1, 50);
         if ( ImGui::Button("Start##gausRange") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
         {
@@ -355,6 +355,53 @@ void MainWindow::drawInterface()
             fileImage.push_back(newImage);
         }
         
+        ImGui::Separator();
+        ImGui::Text("new Bilateral Gaus");
+        ImGui::SliderInt("Kernal##newBilatRange", &bilatRadius, 1, 50);
+        ImGui::SliderInt("Spatial_k##newBilatRange", &bilatSpatialSigma, 1, 500);
+        ImGui::SliderInt("Intensity_k##newBilatRange", &bilatIntensitySigma, 1, 500);
+        if ( ImGui::Button("Start##newBilatRange") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
+        {
+            std::cout<<"Start"<<std::endl;
+            al.clearData();
+            al.setOrigImageSize(fileImage[currentImage].image.getSize().x, fileImage[currentImage].image.getSize().y);
+            for (size_t i = 0; i < fileImage[currentImage].image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < fileImage[currentImage].image.getSize().y; j += 1 )
+                {
+                    al.setOrigImagePixel(i, j, {(unsigned int)fileImage[currentImage].image.getPixel(i, j).b, (unsigned int)fileImage[currentImage].image.getPixel(i, j).g, (unsigned int)fileImage[currentImage].image.getPixel(i, j).r});
+                }
+            }
+            std::cout<<"Start new bilat filter"<<std::endl;
+            auto start = std::chrono::high_resolution_clock::now();
+            al.bilateralFilterRange(bilatRadius, bilatSpatialSigma, bilatIntensitySigma);
+            auto end = std::chrono::high_resolution_clock::now();
+            std::cout<<"End gaus range filter"<<std::endl;
+
+            imageStruct newImage;
+            newImage.filename = "bl_" + std::to_string(bilatRadius) + "_" + std::to_string(bilatSpatialSigma) + "_" + std::to_string(bilatIntensitySigma) + "_" + fileImage[currentImage].filename;
+
+            std::chrono::duration<double> duration = end - start;
+            newImage.workTime = duration.count() * 1000;
+            newImage.mseValue = al.getMSE();
+            newImage.psnrValue = al.getPSNR();
+            newImage.ssimValue = al.getSSIM(10, 1, 1);
+
+            newImage.image = fileImage[currentImage].image;
+            for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
+            {
+                for (size_t j = 0; j < newImage.image.getSize().y; j += 1 )
+                {
+                    newImage.image.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
+                }
+            }
+            std::cout<<"End"<<std::endl;
+
+            newImage.texture.loadFromImage(newImage.image);
+            newImage.sprite.setTexture(newImage.texture);
+
+            fileImage.push_back(newImage);
+        }
         ImGui::Separator();
     }
     if (fileImage.size()>0) ImGui::Separator();

@@ -274,6 +274,7 @@ double algor::power(double base, int exponent)
 
     return isNegativeExponent ? 1 / result : result;
 }
+
 void algor::bilateralFilter(int kernelSize, double spatialSigma, double intensitySigma) 
 {
     modData_ = std::make_shared<BGRValue[]>(width_ * height_);
@@ -316,10 +317,60 @@ void algor::bilateralFilter(int kernelSize, double spatialSigma, double intensit
         }
     }
 }
+
+void algor::bilateralFilter_sigma(int kernelSize, double spatialSigma, double intensitySigma) 
+{
+    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    
+    for (int y = 0; y < height_; y+=1) {
+        for (int x = 0; x < width_; x+=1) {
+            double weightSum_b = 0, weightSum_g = 0, weightSum_r = 0;
+            double filteredValue_b = 0, filteredValue_g = 0, filteredValue_r = 0;
+
+            for (int j = -kernelSize / 2; j <= kernelSize / 2; j+=1) 
+            {
+                for (int i = -kernelSize / 2; i <= kernelSize / 2; i+=1) 
+                {
+                    int neighborX = x + i;
+                    int neighborY = y + j;
+
+                    if (neighborX >= 0 && neighborX < width_ && neighborY >= 0 && neighborY < height_) 
+                    {
+                        double intensityDiff_b = origData_[neighborX * width_ + neighborY].b - origData_[x * width_ + y].b;
+                        double weight_b = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensitySigma);
+                        filteredValue_b += origData_[neighborX * width_ + neighborY].b * weight_b;
+                        weightSum_b += weight_b;
+
+                        double intensityDiff_g = origData_[neighborX * width_ + neighborY].g - origData_[x * width_ + y].g;
+                        double weight_g = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensitySigma);
+                        filteredValue_g += origData_[neighborX * width_ + neighborY].g * weight_g;
+                        weightSum_g += weight_g;
+
+                        double intensityDiff_r = origData_[neighborX * width_ + neighborY].r - origData_[x * width_ + y].r;
+                        double weight_r = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensitySigma);
+                        filteredValue_r += origData_[neighborX * width_ + neighborY].r * weight_r;
+                        weightSum_r += weight_r;
+                    }
+                }
+            }
+
+            modData_[x*width_ + y].b = (int)(filteredValue_b / weightSum_b);
+            modData_[x*width_ + y].g = (int)(filteredValue_g / weightSum_g);
+            modData_[x*width_ + y].r = (int)(filteredValue_r / weightSum_r);
+        }
+    }
+}
+
 double algor::gaussianRange(double x, double sigma) 
 {
     return power(e, (-(x * x) / (2 * sigma * sigma)));
 }
+
+double algor::sigma_kernal(int sigma)
+{
+    return ( 1 / (1+exp(-sigma)) );
+}
+
 void algor::bilateralFilterRange(int kernelSize, double spatialSigma, double rangeSigma) 
 {
     modData_ = std::make_shared<BGRValue[]>(width_ * height_);
@@ -373,6 +424,62 @@ void algor::bilateralFilterRange(int kernelSize, double spatialSigma, double ran
             modData_[j*width_ + i].b = filtered_value_b / norm_factor_b;
             modData_[j*width_ + i].g = filtered_value_g / norm_factor_g;
             modData_[j*width_ + i].r = filtered_value_r / norm_factor_r;
+        }
+    }
+}
+
+// Функция для вычисления адаптивного экспоненциального ядра
+double adaptive_exponential_kernel(int Ip, int Iq, double sigma_r, double beta, double local_contrast)
+{
+    return std::exp(-std::abs(Ip - Iq) / (sigma_r * (1 + beta * local_contrast)));
+}
+
+// Функция для вычисления гауссовского пространственного ядра
+double gaussian_spatial_kernel(int x, int y, double sigma_s)
+{
+    double distance_squared = x * x + y * y;
+    return std::exp(-distance_squared / (2 * sigma_s * sigma_s));
+}
+
+void algor::newbilateralFilter(int kernelSize, double spatialSigma, double intensitySigma) 
+{
+    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    
+    for (int y = 0; y < height_; y+=1) {
+        for (int x = 0; x < width_; x+=1) {
+            double weightSum_b = 0, weightSum_g = 0, weightSum_r = 0;
+            double filteredValue_b = 0, filteredValue_g = 0, filteredValue_r = 0;
+
+            for (int j = -kernelSize / 2; j <= kernelSize / 2; j+=1) 
+            {
+                for (int i = -kernelSize / 2; i <= kernelSize / 2; i+=1) 
+                {
+                    int neighborX = x + i;
+                    int neighborY = y + j;
+
+                    if (neighborX >= 0 && neighborX < width_ && neighborY >= 0 && neighborY < height_) 
+                    {
+                        double intensityDiff_b = origData_[neighborX * width_ + neighborY].b - origData_[x * width_ + y].b;
+                        double weight_b = gaussianBase(i, j, spatialSigma) * gaussianBase(intensityDiff_b, 0, intensitySigma);
+                        filteredValue_b += origData_[neighborX * width_ + neighborY].b * weight_b;
+                        weightSum_b += weight_b;
+
+                        double intensityDiff_g = origData_[neighborX * width_ + neighborY].g - origData_[x * width_ + y].g;
+                        double weight_g = gaussianBase(i, j, spatialSigma) * gaussianBase(intensityDiff_g, 0, intensitySigma);
+                        filteredValue_g += origData_[neighborX * width_ + neighborY].g * weight_g;
+                        weightSum_g += weight_g;
+
+                        double intensityDiff_r = origData_[neighborX * width_ + neighborY].r - origData_[x * width_ + y].r;
+                        double weight_r = gaussianBase(i, j, spatialSigma) * gaussianBase(intensityDiff_r, 0, intensitySigma);
+                        filteredValue_r += origData_[neighborX * width_ + neighborY].r * weight_r;
+                        weightSum_r += weight_r;
+                    }
+                }
+            }
+
+            modData_[x*width_ + y].b = (int)(filteredValue_b / weightSum_b);
+            modData_[x*width_ + y].g = (int)(filteredValue_g / weightSum_g);
+            modData_[x*width_ + y].r = (int)(filteredValue_r / weightSum_r);
         }
     }
 }

@@ -181,6 +181,11 @@ private:
     bool showMetricsWindowFlag = false;
     int origImageM = 0;
     int modImageM = 0;
+
+    int bilatRadius = 1;
+    int bilatSpatialSigma = 1;
+    int bilatIntensitySigma = 1;
+
     BGRValued metricsMSE;
     BGRValued metricsPSNR;
     BGRValued metricsSSIM;

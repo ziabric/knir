@@ -93,6 +93,15 @@ public:
     /**
      * @brief 
      * 
+     * @param kernelSize 
+     * @param spatialSigma 
+     * @param intensitySigma 
+     */
+    void newbilateralFilter(int kernelSize, double spatialSigma, double intensitySigma);
+    void bilateralFilter_sigma(int kernelSize, double spatialSigma, double intensitySigma);
+    /**
+     * @brief 
+     * 
      * @return BGRValued 
      */
     BGRValued getMSE();
@@ -117,6 +126,7 @@ public:
      */
     void swapOrigMod();
 protected:
+
     /// @brief Search median value in array
     /// @param arr Array of median values
     /// @param size Array size
@@ -196,6 +206,33 @@ protected:
      * @return double 
      */
     double power(double base, int exponent);
+    /**
+     * @brief 
+     * 
+     * @param Ip 
+     * @param Iq 
+     * @param sigma_r 
+     * @param beta 
+     * @param local_contrast 
+     * @return double 
+     */
+    double adaptive_exponential_kernel(int Ip, int Iq, double sigma_r, double beta, double local_contrast);
+    /**
+     * @brief 
+     * 
+     * @param x 
+     * @param y 
+     * @param sigma_s 
+     * @return double 
+     */
+    double gaussian_spatial_kernel(int x, int y, double sigma_s);
+    /**
+     * @brief 
+     * 
+     * @param sigma 
+     * @return double 
+     */
+    double sigma_kernal(int sigma);
     /**
      * @brief 
      * 
