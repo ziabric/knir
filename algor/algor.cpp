@@ -337,23 +337,20 @@ void algor::bilateralFilter_sigma(int kernelSize, double spatialSigma, double in
                     if (neighborX >= 0 && neighborX < width_ && neighborY >= 0 && neighborY < height_) 
                     {
                         double intensityDiff_b = origData_[neighborX * width_ + neighborY].b - origData_[x * width_ + y].b;
-                        double weight_b = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_b, 0, intensitySigmaAlpha);
-                        // double weight_b = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensityDiff_b, intensitySigmaAlpha, intensitySigmaBetta);
-                        // double weight_b = gaussianRange(intensityDiff_b, spatialSigma) * sigma_kernal(abs(sqrt(((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)) * ((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)))), intensitySigmaAlpha, intensitySigmaBetta);
+                        // double weight_b = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_b, 0, intensitySigmaAlpha);
+                        double weight_b = koshi_kernal(i, j, spatialSigma) * koshi_kernal(intensityDiff_b, 0, intensitySigmaAlpha);
                         filteredValue_b += origData_[neighborX * width_ + neighborY].b * weight_b;
                         weightSum_b += weight_b;
 
                         double intensityDiff_g = origData_[neighborX * width_ + neighborY].g - origData_[x * width_ + y].g;
-                        double weight_g = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_g, 0, intensitySigmaAlpha);
-                        // double weight_g = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensityDiff_b, intensitySigmaAlpha, intensitySigmaBetta);
-                        // double weight_g = gaussianRange(intensityDiff_g, spatialSigma) * sigma_kernal(abs(sqrt(((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)) * ((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)))), intensitySigmaAlpha, intensitySigmaBetta);
+                        // double weight_g = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_g, 0, intensitySigmaAlpha);
+                        double weight_g = koshi_kernal(i, j, spatialSigma) * koshi_kernal(intensityDiff_g, 0, intensitySigmaAlpha);
                         filteredValue_g += origData_[neighborX * width_ + neighborY].g * weight_g;
                         weightSum_g += weight_g;
 
                         double intensityDiff_r = origData_[neighborX * width_ + neighborY].r - origData_[x * width_ + y].r;
-                        double weight_r = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_r, 0, intensitySigmaAlpha);
-                        // double weight_r = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensityDiff_b, intensitySigmaAlpha, intensitySigmaBetta);
-                        // double weight_r = gaussianRange(intensityDiff_r, spatialSigma) * sigma_kernal(abs(sqrt(((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)) * ((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)))), intensitySigmaAlpha, intensitySigmaBetta);
+                        // double weight_r = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_r, 0, intensitySigmaAlpha);
+                        double weight_r = koshi_kernal(i, j, spatialSigma) * koshi_kernal(intensityDiff_r, 0, intensitySigmaAlpha);
                         filteredValue_r += origData_[neighborX * width_ + neighborY].r * weight_r;
                         weightSum_r += weight_r;
                     }
