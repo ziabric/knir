@@ -318,7 +318,7 @@ void algor::bilateralFilter(int kernelSize, double spatialSigma, double intensit
     }
 }
 
-void algor::bilateralFilter_sigma(int kernelSize, double spatialSigma, double intensitySigma) 
+void algor::bilateralFilter_sigma(int kernelSize, double spatialSigma, double intensitySigmaAlpha, double intensitySigmaBetta) 
 {
     modData_ = std::make_shared<BGRValue[]>(width_ * height_);
     
@@ -337,17 +337,23 @@ void algor::bilateralFilter_sigma(int kernelSize, double spatialSigma, double in
                     if (neighborX >= 0 && neighborX < width_ && neighborY >= 0 && neighborY < height_) 
                     {
                         double intensityDiff_b = origData_[neighborX * width_ + neighborY].b - origData_[x * width_ + y].b;
-                        double weight_b = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensitySigma);
+                        double weight_b = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_b, 0, intensitySigmaAlpha);
+                        // double weight_b = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensityDiff_b, intensitySigmaAlpha, intensitySigmaBetta);
+                        // double weight_b = gaussianRange(intensityDiff_b, spatialSigma) * sigma_kernal(abs(sqrt(((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)) * ((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)))), intensitySigmaAlpha, intensitySigmaBetta);
                         filteredValue_b += origData_[neighborX * width_ + neighborY].b * weight_b;
                         weightSum_b += weight_b;
 
                         double intensityDiff_g = origData_[neighborX * width_ + neighborY].g - origData_[x * width_ + y].g;
-                        double weight_g = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensitySigma);
+                        double weight_g = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_g, 0, intensitySigmaAlpha);
+                        // double weight_g = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensityDiff_b, intensitySigmaAlpha, intensitySigmaBetta);
+                        // double weight_g = gaussianRange(intensityDiff_g, spatialSigma) * sigma_kernal(abs(sqrt(((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)) * ((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)))), intensitySigmaAlpha, intensitySigmaBetta);
                         filteredValue_g += origData_[neighborX * width_ + neighborY].g * weight_g;
                         weightSum_g += weight_g;
 
                         double intensityDiff_r = origData_[neighborX * width_ + neighborY].r - origData_[x * width_ + y].r;
-                        double weight_r = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensitySigma);
+                        double weight_r = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_r, 0, intensitySigmaAlpha);
+                        // double weight_r = gaussianBase(i, j, spatialSigma) * sigma_kernal(intensityDiff_b, intensitySigmaAlpha, intensitySigmaBetta);
+                        // double weight_r = gaussianRange(intensityDiff_r, spatialSigma) * sigma_kernal(abs(sqrt(((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)) * ((x-neighborX)*(x-neighborX) + (y-neighborY)*(y-neighborY)))), intensitySigmaAlpha, intensitySigmaBetta);
                         filteredValue_r += origData_[neighborX * width_ + neighborY].r * weight_r;
                         weightSum_r += weight_r;
                     }
@@ -366,9 +372,14 @@ double algor::gaussianRange(double x, double sigma)
     return power(e, (-(x * x) / (2 * sigma * sigma)));
 }
 
-double algor::sigma_kernal(int sigma)
+double algor::koshi_kernal(int x, int y, double sigma)
 {
-    return ( 1 / (1+exp(-sigma)) );
+    return ( 1 / ( 1 + (x*x + y*y) / (sigma * sigma) ) );
+}
+
+double algor::sigma_kernal(double x, double alpha, double beta)
+{
+    return 1.0 / (1.0 + exp(-beta * (x - alpha)));
 }
 
 void algor::bilateralFilterRange(int kernelSize, double spatialSigma, double rangeSigma) 
@@ -426,19 +437,6 @@ void algor::bilateralFilterRange(int kernelSize, double spatialSigma, double ran
             modData_[j*width_ + i].r = filtered_value_r / norm_factor_r;
         }
     }
-}
-
-// Функция для вычисления адаптивного экспоненциального ядра
-double adaptive_exponential_kernel(int Ip, int Iq, double sigma_r, double beta, double local_contrast)
-{
-    return std::exp(-std::abs(Ip - Iq) / (sigma_r * (1 + beta * local_contrast)));
-}
-
-// Функция для вычисления гауссовского пространственного ядра
-double gaussian_spatial_kernel(int x, int y, double sigma_s)
-{
-    double distance_squared = x * x + y * y;
-    return std::exp(-distance_squared / (2 * sigma_s * sigma_s));
 }
 
 void algor::newbilateralFilter(int kernelSize, double spatialSigma, double intensitySigma) 

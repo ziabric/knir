@@ -184,7 +184,8 @@ private:
 
     int bilatRadius = 1;
     int bilatSpatialSigma = 1;
-    int bilatIntensitySigma = 1;
+    float bilatSigmaAlpha = 0;
+    float bilatSigmaBetta = 0;
 
     BGRValued metricsMSE;
     BGRValued metricsPSNR;

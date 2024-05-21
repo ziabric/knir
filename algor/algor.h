@@ -98,7 +98,8 @@ public:
      * @param intensitySigma 
      */
     void newbilateralFilter(int kernelSize, double spatialSigma, double intensitySigma);
-    void bilateralFilter_sigma(int kernelSize, double spatialSigma, double intensitySigma);
+
+    void bilateralFilter_sigma(int kernelSize, double spatialSigma, double intensitySigmaAlpha, double intensitySigmaBetta);
     /**
      * @brief 
      * 
@@ -216,23 +217,19 @@ protected:
      * @param local_contrast 
      * @return double 
      */
-    double adaptive_exponential_kernel(int Ip, int Iq, double sigma_r, double beta, double local_contrast);
+    double gaussian_spatial_kernel(int x, int y, double sigma_s);
+    
+    double koshi_kernal(int x, int y, double sigma);
+    
     /**
      * @brief 
      * 
      * @param x 
-     * @param y 
-     * @param sigma_s 
+     * @param alpha 
+     * @param beta 
      * @return double 
      */
-    double gaussian_spatial_kernel(int x, int y, double sigma_s);
-    /**
-     * @brief 
-     * 
-     * @param sigma 
-     * @return double 
-     */
-    double sigma_kernal(int sigma);
+    double sigma_kernal(double x, double alpha, double beta);
     /**
      * @brief 
      * 

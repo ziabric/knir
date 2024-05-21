@@ -358,8 +358,9 @@ void MainWindow::drawInterface()
         ImGui::Separator();
         ImGui::Text("new Bilateral Gaus");
         ImGui::SliderInt("Kernal##newBilatRange", &bilatRadius, 1, 50);
-        ImGui::SliderInt("Spatial_k##newBilatRange", &bilatSpatialSigma, 1, 500);
-        ImGui::SliderInt("Intensity_k##newBilatRange", &bilatIntensitySigma, 1, 500);
+        ImGui::SliderInt("Spatial_k##newBilatRange", &bilatSpatialSigma, 0, 500);
+        ImGui::SliderFloat("Intensity_A##newBilatRange", &bilatSigmaAlpha, 0, 100);
+        ImGui::SliderFloat("Intensity_B##newBilatRange", &bilatSigmaBetta, 0, 1);
         if ( ImGui::Button("Start##newBilatRange") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
         {
             std::cout<<"Start"<<std::endl;
@@ -374,12 +375,12 @@ void MainWindow::drawInterface()
             }
             std::cout<<"Start new bilat filter"<<std::endl;
             auto start = std::chrono::high_resolution_clock::now();
-            al.bilateralFilterRange(bilatRadius, bilatSpatialSigma, bilatIntensitySigma);
+            al.bilateralFilter_sigma(bilatRadius, bilatSpatialSigma, bilatSigmaAlpha, bilatSigmaBetta);
             auto end = std::chrono::high_resolution_clock::now();
             std::cout<<"End gaus range filter"<<std::endl;
 
             imageStruct newImage;
-            newImage.filename = "bl_" + std::to_string(bilatRadius) + "_" + std::to_string(bilatSpatialSigma) + "_" + std::to_string(bilatIntensitySigma) + "_" + fileImage[currentImage].filename;
+            newImage.filename = "bl_" + std::to_string(bilatRadius) + "_" + std::to_string(bilatSpatialSigma) + "_" + std::to_string(bilatSigmaAlpha) + "_ " + std::to_string(bilatSigmaBetta) + "_" + fileImage[currentImage].filename;
 
             std::chrono::duration<double> duration = end - start;
             newImage.workTime = duration.count() * 1000;
