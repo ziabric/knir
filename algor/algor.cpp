@@ -318,6 +318,92 @@ void algor::bilateralFilter(int kernelSize, double spatialSigma, double intensit
     }
 }
 
+// void algor::bilateralFilter_koshi(int kernelSize, double spatialSigma, double intensitySigma) 
+// {
+//     modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    
+//     for (int y = 0; y < height_; y+=1) {
+//         for (int x = 0; x < width_; x+=1) {
+//             double weightSum_b = 0, weightSum_g = 0, weightSum_r = 0;
+//             double filteredValue_b = 0, filteredValue_g = 0, filteredValue_r = 0;
+
+//             for (int j = -kernelSize / 2; j <= kernelSize / 2; j+=1) 
+//             {
+//                 for (int i = -kernelSize / 2; i <= kernelSize / 2; i+=1) 
+//                 {
+//                     int neighborX = x + i;
+//                     int neighborY = y + j;
+
+//                     if (neighborX >= 0 && neighborX < width_ && neighborY >= 0 && neighborY < height_) 
+//                     {
+//                         double intensityDiff_b = origData_[neighborX * width_ + neighborY].b - origData_[x * width_ + y].b;
+//                         double weight_b = koshi_kernal(i, j, spatialSigma) * koshi_kernal(intensityDiff_b, 0, intensitySigma);
+//                         filteredValue_b += origData_[neighborX * width_ + neighborY].b * weight_b;
+//                         weightSum_b += weight_b;
+
+//                         double intensityDiff_g = origData_[neighborX * width_ + neighborY].g - origData_[x * width_ + y].g;
+//                         double weight_g = koshi_kernal(i, j, spatialSigma) * koshi_kernal(intensityDiff_g, 0, intensitySigma);
+//                         filteredValue_g += origData_[neighborX * width_ + neighborY].g * weight_g;
+//                         weightSum_g += weight_g;
+
+//                         double intensityDiff_r = origData_[neighborX * width_ + neighborY].r - origData_[x * width_ + y].r;
+//                         double weight_r = koshi_kernal(i, j, spatialSigma) * koshi_kernal(intensityDiff_r, 0, intensitySigma);
+//                         filteredValue_r += origData_[neighborX * width_ + neighborY].r * weight_r;
+//                         weightSum_r += weight_r;
+//                     }
+//                 }
+//             }
+
+//             modData_[x*width_ + y].b = (int)(filteredValue_b / weightSum_b);
+//             modData_[x*width_ + y].g = (int)(filteredValue_g / weightSum_g);
+//             modData_[x*width_ + y].r = (int)(filteredValue_r / weightSum_r);
+//         }
+//     }
+// }
+
+void algor::bilateralFilter_gaus_koshi(int kernelSize, double spatialSigma, double intensitySigma) 
+{
+    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    
+    for (int y = 0; y < height_; y+=1) {
+        for (int x = 0; x < width_; x+=1) {
+            double weightSum_b = 0, weightSum_g = 0, weightSum_r = 0;
+            double filteredValue_b = 0, filteredValue_g = 0, filteredValue_r = 0;
+
+            for (int j = -kernelSize / 2; j <= kernelSize / 2; j+=1) 
+            {
+                for (int i = -kernelSize / 2; i <= kernelSize / 2; i+=1) 
+                {
+                    int neighborX = x + i;
+                    int neighborY = y + j;
+
+                    if (neighborX >= 0 && neighborX < width_ && neighborY >= 0 && neighborY < height_) 
+                    {
+                        double intensityDiff_b = origData_[neighborX * width_ + neighborY].b - origData_[x * width_ + y].b;
+                        double weight_b = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_b, 0, intensitySigma);
+                        filteredValue_b += origData_[neighborX * width_ + neighborY].b * weight_b;
+                        weightSum_b += weight_b;
+
+                        double intensityDiff_g = origData_[neighborX * width_ + neighborY].g - origData_[x * width_ + y].g;
+                        double weight_g = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_g, 0, intensitySigma);
+                        filteredValue_g += origData_[neighborX * width_ + neighborY].g * weight_g;
+                        weightSum_g += weight_g;
+
+                        double intensityDiff_r = origData_[neighborX * width_ + neighborY].r - origData_[x * width_ + y].r;
+                        double weight_r = koshi_kernal(i, j, spatialSigma) * gaussianBase(intensityDiff_r, 0, intensitySigma);
+                        filteredValue_r += origData_[neighborX * width_ + neighborY].r * weight_r;
+                        weightSum_r += weight_r;
+                    }
+                }
+            }
+
+            modData_[x*width_ + y].b = (int)(filteredValue_b / weightSum_b);
+            modData_[x*width_ + y].g = (int)(filteredValue_g / weightSum_g);
+            modData_[x*width_ + y].r = (int)(filteredValue_r / weightSum_r);
+        }
+    }
+}
+
 void algor::bilateralFilter_sigma(int kernelSize, double spatialSigma, double intensitySigmaAlpha, double intensitySigmaBetta) 
 {
     modData_ = std::make_shared<BGRValue[]>(width_ * height_);

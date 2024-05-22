@@ -175,17 +175,23 @@ private:
     int gausKernalSize = 1;
     int gausSpatialSigma = 1;
     int gausIntensitySigma = 1;
-    int gausRangeKernalSize = 1;
-    int gausRangeSpatialSigma = 1;
-    int gausRangeSigma = 1;
-    bool showMetricsWindowFlag = false;
-    int origImageM = 0;
-    int modImageM = 0;
+
+    int koshiBilatRadius = 1;
+    int koshiBilatSpatialSigma = 1;
+    int koshiBilatIntensitySigma = 1;
+
+    int gauskoshiBilatRadius = 1;
+    int gauskoshiBilatSpatialSigma = 1;
+    int gauskoshiBilatIntensitySigma = 1;
 
     int bilatRadius = 1;
     int bilatSpatialSigma = 1;
-    float bilatSigmaAlpha = 0;
+    int bilatSigmaAlpha = 0;
     float bilatSigmaBetta = 0;
+
+    bool showMetricsWindowFlag = false;
+    int origImageM = 0;
+    int modImageM = 0;
 
     BGRValued metricsMSE;
     BGRValued metricsPSNR;

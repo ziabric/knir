@@ -98,8 +98,23 @@ public:
      * @param intensitySigma 
      */
     void newbilateralFilter(int kernelSize, double spatialSigma, double intensitySigma);
-
     void bilateralFilter_sigma(int kernelSize, double spatialSigma, double intensitySigmaAlpha, double intensitySigmaBetta);
+    /**
+     * @brief 
+     * 
+     * @param kernelSize 
+     * @param spatialSigma 
+     * @param intensitySigma 
+     */
+    void bilateralFilter_koshi(int kernelSize, double spatialSigma, double intensitySigma);
+    /**
+     * @brief 
+     * 
+     * @param kernelSize 
+     * @param spatialSigma 
+     * @param intensitySigma 
+     */
+    void bilateralFilter_gaus_koshi(int kernelSize, double spatialSigma, double intensitySigma);
     /**
      * @brief 
      * 
@@ -218,9 +233,15 @@ protected:
      * @return double 
      */
     double gaussian_spatial_kernel(int x, int y, double sigma_s);
-    
+    /**
+     * @brief 
+     * 
+     * @param x 
+     * @param y 
+     * @param sigma 
+     * @return double 
+     */
     double koshi_kernal(int x, int y, double sigma);
-    
     /**
      * @brief 
      * 

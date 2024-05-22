@@ -10,8 +10,8 @@ include_directories( ${PROJECT_SOURCE_DIR}/gui )
 include_directories( ${PROJECT_SOURCE_DIR}/algor )
 include_directories( ${PROJECT_SOURCE_DIR}/tests )
 
-find_package(SFML COMPONENTS system graphics audio network REQUIRED)
-# find_package(OpenCV REQUIRED)
+find_package(SFML COMPONENTS graphics REQUIRED)
+find_package(OpenGL REQUIRED)
 
 set(IMGUI
         imgui/imconfig.h
@@ -45,24 +45,15 @@ file(GLOB ALGOR
 
 file(GLOB TESTS
         ${PROJECT_SOURCE_DIR}/tests/*
-        ${PROJECT_SOURCE_DIR}/algor/*
 )
 
 add_library(algor STATIC ${ALGOR})
 
-add_executable(test ${TESTS})
+add_executable(test ${TESTS} ${ALGOR})
 target_link_libraries(test)
 
-if(WIN32)
-    add_executable(${PROJECT_NAME} WIN32 ${SOURCES} ${GUI} ${IMGUI})
-    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system opengl32 ${OpenCV_LIBS} algor)
-endif()
+add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
+target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics OpenGL::GL algor)
 
-if(UNIX)
-    add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
-    target_link_libraries(${PROJECT_NAME} PRIVATE sfml-window sfml-network sfml-graphics sfml-system GL ${OpenCV_LIBS} algor)
-endif()
-
-install(FILES ${PROJECT_SOURCE_DIR}/model/coco.yaml DESTINATION ${PROJECT_BINARY_DIR}/)
-install(FILES ${PROJECT_SOURCE_DIR}/model/yolov5s.onnx DESTINATION ${PROJECT_BINARY_DIR}/)
-
+# install(FILES $<TARGET_FILE::sfml-graphics> DESTINATION ${PROJECT_BINARY_DIR}/)
+# install (FILES ${SFML_DIR}/../../../bin/sfml-graphics-2 DESTINATION ${PROJECT_BINARY_DIR}/)
