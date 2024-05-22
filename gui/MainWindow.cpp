@@ -442,7 +442,7 @@ void MainWindow::drawInterface()
             std::cout<<"End gaus range filter"<<std::endl;
 
             imageStruct newImage;
-            newImage.filename = "bl_" + std::to_string(bilatRadius) + "_" + std::to_string(bilatSpatialSigma) + "_" + std::to_string(bilatSigmaAlpha) + "_ " + std::to_string(bilatSigmaBetta) + "_" + fileImage[currentImage].filename;
+            newImage.filename = "bl_" + std::to_string(bilatRadius) + "_" + std::to_string(bilatSpatialSigma) + "_" + std::to_string(bilatSigmaAlpha) + "_" + fileImage[currentImage].filename;
 
             std::chrono::duration<double> duration = end - start;
             newImage.workTime = duration.count() * 1000;
@@ -604,6 +604,11 @@ void MainWindow::openImage(fs::path pathToImage)
     std::cout<<tmp.image.loadFromFile(pathToImage)<<std::endl;
     tmp.filename = pathToImage.filename().string();
     tmp.scale = 1;
+
+    if (tmp.image.getSize().x > 1050 || tmp.image.getSize().y > 1050) 
+    {
+        return;
+    }
 
     fileImage.push_back(tmp);
     filesystemOpenFlag = false;
