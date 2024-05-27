@@ -2,14 +2,18 @@
 
 algor::~algor()
 {
-    origData_.reset();
-    modData_.reset();
+    // origData_.reset();
+    // modData_.reset();
+
+    delete[] origData_;
+    delete[] modData_;
 }
 void algor::setOrigImageSize(unsigned int width, unsigned int height)
 {
     width_ = width;
     height_ = height;
-    origData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    origData_ = new BGRValue[width_ * height_];
+    // origData_ = std::make_shared<BGRValue[]>(width_ * height_);
 }
 bool algor::setOrigImagePixel(int column, int row, BGRValue pixel)
 {
@@ -46,14 +50,19 @@ bool algor::modImageAvailable() const
 }
 void algor::clearData()
 {
-    origData_.reset();
-    modData_.reset();
+    // origData_.reset();
+    // modData_.reset();
+
+    delete[] origData_;
+    delete[] modData_;
+
     width_ = 0;
     height_ = 0;
 }
 void algor::medianFilter(int radius)
 {
-    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    modData_ = new BGRValue[width_ * height_];
+    // modData_ = std::make_shared<BGRValue[]>(width_ * height_);
 
     int windowSize = (2 * radius + 1) * (2 * radius + 1);
 
@@ -86,7 +95,8 @@ void algor::medianFilter(int radius)
 }
 void algor::newMedianFilter(int radius)
 {
-    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    modData_ = new BGRValue[width_ * height_];
+    // modData_ = std::make_shared<BGRValue[]>(width_ * height_);
 
     int windowSize = (2 * radius + 1) * (2 * radius + 1);
 
@@ -218,7 +228,8 @@ double algor::abs(double x)
 }
 void algor::haar()
 {
-    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    modData_ = new BGRValue[width_ * height_];
+    // modData_ = std::make_shared<BGRValue[]>(width_ * height_);
     unsigned int c = 0;
     unsigned int d = 0;
 
@@ -277,7 +288,8 @@ double algor::power(double base, int exponent)
 
 void algor::bilateralFilter(int kernelSize, double spatialSigma, double intensitySigma) 
 {
-    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    modData_ = new BGRValue[width_ * height_];
+    // modData_ = std::make_shared<BGRValue[]>(width_ * height_);
     
     for (int y = 0; y < height_; y+=1) {
         for (int x = 0; x < width_; x+=1) {
@@ -363,7 +375,8 @@ void algor::bilateralFilter(int kernelSize, double spatialSigma, double intensit
 
 void algor::bilateralFilter_gaus_koshi(int kernelSize, double spatialSigma, double intensitySigma) 
 {
-    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    modData_ = new BGRValue[width_ * height_];
+    // modData_ = std::make_shared<BGRValue[]>(width_ * height_);
     
     for (int y = 0; y < height_; y+=1) {
         for (int x = 0; x < width_; x+=1) {
@@ -406,7 +419,8 @@ void algor::bilateralFilter_gaus_koshi(int kernelSize, double spatialSigma, doub
 
 void algor::bilateralFilter_sigma(int kernelSize, double spatialSigma, double intensitySigmaAlpha, double intensitySigmaBetta) 
 {
-    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    modData_ = new BGRValue[width_ * height_];
+    // modData_ = std::make_shared<BGRValue[]>(width_ * height_);
     
     for (int y = 0; y < height_; y+=1) {
         for (int x = 0; x < width_; x+=1) {
@@ -467,7 +481,8 @@ double algor::sigma_kernal(double x, double alpha, double beta)
 
 void algor::bilateralFilterRange(int kernelSize, double spatialSigma, double rangeSigma) 
 {
-    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    modData_ = new BGRValue[width_ * height_];
+    // modData_ = std::make_shared<BGRValue[]>(width_ * height_);
 
     int half_kernel = kernelSize / 2;
     for (int i = 0; i < height_; i+=1) {
@@ -524,7 +539,8 @@ void algor::bilateralFilterRange(int kernelSize, double spatialSigma, double ran
 
 void algor::newbilateralFilter(int kernelSize, double spatialSigma, double intensitySigma) 
 {
-    modData_ = std::make_shared<BGRValue[]>(width_ * height_);
+    modData_ = new BGRValue[width_ * height_];
+    // modData_ = std::make_shared<BGRValue[]>(width_ * height_);
     
     for (int y = 0; y < height_; y+=1) {
         for (int x = 0; x < width_; x+=1) {
@@ -605,13 +621,21 @@ BGRValued algor::getPSNR()
 
 BGRValued algor::getSSIM(int radius, int c1, int c2)
 {
-    BGRValued mu1 = average(origData_.get(), width_*height_);
-    BGRValued mu2 = average(modData_.get(), width_*height_);
+    // BGRValued mu1 = average(origData_.get(), width_*height_);
+    // BGRValued mu2 = average(modData_.get(), width_*height_);
 
-    BGRValued sigma1 = variance(origData_.get(), width_*height_, mu1);
-    BGRValued sigma2 = variance(modData_.get(), width_*height_, mu2);
+    // BGRValued sigma1 = variance(origData_.get(), width_*height_, mu1);
+    // BGRValued sigma2 = variance(modData_.get(), width_*height_, mu2);
 
-    BGRValued sigma12 = covariance(origData_.get(), modData_.get(), width_*height_, mu1, mu2);
+    // BGRValued sigma12 = covariance(origData_.get(), modData_.get(), width_*height_, mu1, mu2);
+
+    BGRValued mu1 = average(origData_, width_*height_);
+    BGRValued mu2 = average(modData_, width_*height_);
+
+    BGRValued sigma1 = variance(origData_, width_*height_, mu1);
+    BGRValued sigma2 = variance(modData_, width_*height_, mu2);
+
+    BGRValued sigma12 = covariance(origData_, modData_, width_*height_, mu1, mu2);
 
     BGRValued output;
 
@@ -666,5 +690,17 @@ BGRValued algor::covariance(BGRValue* arr1,  BGRValue* arr2, int size, BGRValued
 
 void algor::swapOrigMod()
 {
-    modData_.swap(origData_);
+    // modData_.swap(origData_);
+    
+    if ( width_ <= 0 || height_ <= 0 ) return ;
+
+    modData_ = new BGRValue[width_*height_];
+
+    BGRValue swpValue;
+    for (int i = 0; i < (width_ * height_); i += 1)
+    {
+        swpValue = origData_[i];
+        origData_[i] = modData_[i];
+        modData_[i] = swpValue;
+    }
 }

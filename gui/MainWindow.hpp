@@ -151,6 +151,7 @@ private:
             ".jpeg",
             ".jpg"
     };
+    ImFont* font1;
     std::vector<imageStruct> fileImage;
     float maxFileScale = 20;
     float minFileScale = 0.1;

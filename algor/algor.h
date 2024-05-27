@@ -285,9 +285,9 @@ private:
     /// @brief Image Width
     unsigned int width_;
     /// @brief Pointer to the pixel values of the original image
-    std::shared_ptr<BGRValue[]> origData_ = nullptr;
+    BGRValue* origData_ = nullptr;
     /// @brief Pointer to the pixel values of the modified image
-    std::shared_ptr<BGRValue[]> modData_ = nullptr;
+    BGRValue* modData_ = nullptr;
     /// @brief exp
     float e = 2.718281828459045;
 };

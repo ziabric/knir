@@ -10,6 +10,9 @@ include_directories( ${PROJECT_SOURCE_DIR}/gui )
 include_directories( ${PROJECT_SOURCE_DIR}/algor )
 include_directories( ${PROJECT_SOURCE_DIR}/tests )
 
+set(SFML_STATIC_LIBRARIES TRUE)
+set(SFML_DIR "/home/nk/Downloads/SFML-2.6.1/build/")
+
 find_package(SFML COMPONENTS graphics REQUIRED)
 find_package(OpenGL REQUIRED)
 
@@ -54,6 +57,3 @@ target_link_libraries(test)
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${GUI} ${IMGUI})
 target_link_libraries(${PROJECT_NAME} PRIVATE sfml-graphics OpenGL::GL algor)
-
-# install(FILES $<TARGET_FILE::sfml-graphics> DESTINATION ${PROJECT_BINARY_DIR}/)
-# install (FILES ${SFML_DIR}/../../../bin/sfml-graphics-2 DESTINATION ${PROJECT_BINARY_DIR}/)

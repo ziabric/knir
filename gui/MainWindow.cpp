@@ -19,52 +19,54 @@ size(width_, height_)
     tmp = base64_decode(mainIconString);
     mainIcon.loadFromMemory(tmp.data(), tmp.size());
     // window->setIcon(64, 64, tmp.data());
+
+    if (ImGui::SFML::Init(*window))
+    {
+        auto tmp = base64_decode(fontString);
+        font1 = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(tmp.data(), tmp.size(), 18, nullptr, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
+        if ( !ImGui::SFML::UpdateFontTexture() )
+        {
+        }
+    }
 }
 MainWindow::~MainWindow()
 {
+    delete font1;
     ImGui::SFML::Shutdown();
     delete window;
 }
 int MainWindow::mainloop()
 {
-    if (ImGui::SFML::Init(*window))
+    while (window->isOpen())
     {
-        auto tmp = base64_decode(fontString);
-        ImFont* font1 = ImGui::GetIO().Fonts->AddFontFromMemoryTTF(tmp.data(), tmp.size(), 18, nullptr, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
-        if ( !ImGui::SFML::UpdateFontTexture() )
+        sf::Event event {};
+        while (window->pollEvent(event))
         {
-            return 0;
-        }
-        while (window->isOpen())
-        {
-            sf::Event event {};
-            while (window->pollEvent(event))
+            ImGui::SFML::ProcessEvent(*window, event);
+
+            if (event.type == sf::Event::Closed)
             {
-                ImGui::SFML::ProcessEvent(*window, event);
-
-                if (event.type == sf::Event::Closed)
-                {
-                    window->close();
-                }
+                window->close();
             }
-            ImGui::SFML::Update(*window, deltaClock.restart());
-            ImGui::PushFont(font1);
-
-            size = {(float)window->getSize().x, (float)window->getSize().y};
-            
-            drawInterface();
-            drawExportFile();
-            drawFilesystem();
-            drawMetricsWindow();
-            drawImage();
-
-            ImGui::PopFont();
-
-            window->clear();
-            ImGui::SFML::Render(*window);
-            window->display();
         }
+        ImGui::SFML::Update(*window, deltaClock.restart());
+        ImGui::PushFont(font1);
+
+        size = {(float)window->getSize().x, (float)window->getSize().y};
+        
+        drawInterface();
+        drawExportFile();
+        drawFilesystem();
+        drawMetricsWindow();
+        drawImage();
+
+        ImGui::PopFont();
+
+        window->clear();
+        ImGui::SFML::Render(*window);
+        window->display();
     }
+
     return 0;
 }
 void MainWindow::drawInterface()
@@ -369,60 +371,10 @@ void MainWindow::drawInterface()
 
 
 
-        // ImGui::Text("Bilateral Koshi");
-        // ImGui::SliderInt("Kernal##koshiBilatRadius", &koshiBilatRadius, 1, 50);
-        // ImGui::SliderInt("Spatial_k##kohiBilatSigma", &koshiBilatSpatialSigma, 1, 500);
-        // ImGui::SliderInt("Intensity_k##koshiBilatSigma", &koshiBilatIntensitySigma, 1, 100);
-        // if ( ImGui::Button("Start##koshiBilat") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
-        // {
-        //     std::cout<<"Start"<<std::endl;
-        //     al.clearData();
-        //     al.setOrigImageSize(fileImage[currentImage].image.getSize().x, fileImage[currentImage].image.getSize().y);
-        //     for (size_t i = 0; i < fileImage[currentImage].image.getSize().x; i += 1)
-        //     {
-        //         for (size_t j = 0; j < fileImage[currentImage].image.getSize().y; j += 1 )
-        //         {
-        //             al.setOrigImagePixel(i, j, {(unsigned int)fileImage[currentImage].image.getPixel(i, j).b, (unsigned int)fileImage[currentImage].image.getPixel(i, j).g, (unsigned int)fileImage[currentImage].image.getPixel(i, j).r});
-        //         }
-        //     }
-        //     auto start = std::chrono::high_resolution_clock::now();
-        //     al.bilateralFilter_sigma(koshiBilatRadius, koshiBilatSpatialSigma, koshiBilatIntensitySigma, 0);
-        //     auto end = std::chrono::high_resolution_clock::now();
-
-        //     imageStruct newImage;
-        //     newImage.filename = "bk_" + std::to_string(koshiBilatRadius) + "_" + std::to_string(koshiBilatSpatialSigma) + "_" + std::to_string(koshiBilatIntensitySigma) + "_"+ fileImage[currentImage].filename;
-
-        //     std::chrono::duration<double> duration = end - start;
-        //     newImage.workTime = duration.count() * 1000;
-        //     newImage.mseValue = al.getMSE();
-        //     newImage.psnrValue = al.getPSNR();
-        //     newImage.ssimValue = al.getSSIM(10, 1, 1);
-
-        //     newImage.image = fileImage[currentImage].image;
-        //     for (size_t i = 0; i < newImage.image.getSize().x; i += 1)
-        //     {
-        //         for (size_t j = 0; j < newImage.image.getSize().y; j += 1 )
-        //         {
-        //             newImage.image.setPixel(i, j, {(sf::Uint8)al.getModImagePixel(i, j).r, (sf::Uint8)al.getModImagePixel(i, j).g, (sf::Uint8)al.getModImagePixel(i, j).b});
-        //         }
-        //     }
-        //     std::cout<<"End"<<std::endl;
-
-        //     newImage.texture.loadFromImage(newImage.image);
-        //     newImage.sprite.setTexture(newImage.texture);
-
-        //     fileImage.push_back(newImage);
-        // }
-        // ImGui::Separator();
-
-
-
-        ImGui::Separator();
         ImGui::Text("Bilateral Koshi");
         ImGui::SliderInt("Kernal##newBilatRange", &bilatRadius, 1, 50);
         ImGui::SliderInt("Spatial_k##newBilatRange", &bilatSpatialSigma, 0, 500);
-        ImGui::SliderInt("Intensity_k##newBilatRange", &bilatSigmaAlpha, 0, 100);
-        // ImGui::SliderFloat("Intensity_B##newBilatRange", &bilatSigmaBetta, 0, 1);
+        ImGui::SliderInt("Intensity_k##newBilatRange", &bilatSigmaAlpha, 0, 500);
         if ( ImGui::Button("Start##newBilatRange") && currentImage >= 0 && currentImage < fileImage.size() && fileImage[currentImage].filename != "")
         {
             std::cout<<"Start"<<std::endl;
